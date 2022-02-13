@@ -15,6 +15,9 @@ def alphaBlend(img1, img2, mask):   # source: https://stackoverflow.com/a/482748
 
 
 def round_blur(img, bboxes):
+    if bboxes is None:
+        return img
+
     mask = np.zeros(img.shape, dtype='uint8')
 
     for bb in bboxes:
