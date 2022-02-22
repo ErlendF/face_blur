@@ -26,14 +26,14 @@ def get_dists(seqs, faces):  # TODO: try not to loop over every face and sequenc
         face_dists = []
 
         for i, seq in enumerate(seqs):
-            face_dists.append((i, face_dist(seq[-1], face)))
+            face_dists.append((i, face_dist(seq, face)))
         face_dists.sort(key=lambda x: x[1])
         dists.append(face_dists)
 
     return dists
 
 
-def map_faces(seqs, faces):
+def map_faces(seqs, faces):  # seqs should be the last face in each sequence
     dists = get_dists(seqs, faces)
     # list of which sequences gets faces mapped to it
     identified = [-1] * len(seqs)
