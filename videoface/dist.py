@@ -44,7 +44,7 @@ def map_faces(seqs, faces):  # seqs should be the last face in each sequence
             if dist[1] > score_threshold:   # Only accepting scores lower than the threshold
                 break
 
-            if identified[dist[0]] != -1:   # Using the sequence with lowest distance
+            if identified[dist[0]] == -1:   # Using the sequence with lowest distance
                 identified[dist[0]] = i
                 break
 
