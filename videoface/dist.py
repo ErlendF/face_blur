@@ -22,10 +22,10 @@ def face_dist(f1, f2):
 
 def get_dists(seqs, faces):  # TODO: try not to loop over every face and sequence => n^2
     dists = []
-    for face in faces:
+    for seq in seqs:
         face_dists = []
 
-        for i, seq in enumerate(seqs):
+        for i, face in enumerate(faces):
             face_dists.append((i, face_dist(seq, face)))
         face_dists.sort(key=lambda x: x[1])
         dists.append(face_dists)
@@ -49,3 +49,11 @@ def map_faces(seqs, faces):  # seqs should be the last face in each sequence
                 break
 
     return identified
+
+
+def compare_faces(f1, f2):
+    dist = face_dist(f1, f2)
+    if dist < score_threshold:
+        return True, dist
+
+    return False, dist
