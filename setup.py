@@ -7,5 +7,5 @@ setup(
     author='Erlend Fonnes',
     packages=find_packages(),
     install_requires=["numpy", "opencv-python",
-                      "matplotlib.pyplot", "face_recognition"]
+                      "matplotlib", "face_recognition"]
 )
