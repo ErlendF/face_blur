@@ -7,5 +7,5 @@ setup(
     author='Erlend Fonnes',
     packages=find_packages(),
     install_requires=["numpy", "opencv-python",
-                      "bisect", "copy", "matplotlib.pyplot", "face_recognition"]
+                      "matplotlib.pyplot", "face_recognition"]
 )
