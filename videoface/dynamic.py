@@ -149,7 +149,6 @@ def make_sequences(frames_by_nr, matchings, frame_diff_threshold=40):
 
                 likely_same, dist = compare_faces(
                     finished_seqs[i][-1], finished_seqs[j][0])
-                print(i, j, likely_same, dist)
                 if not likely_same:
                     continue
 

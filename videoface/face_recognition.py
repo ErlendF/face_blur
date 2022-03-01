@@ -31,3 +31,9 @@ def compare(prev_faces, new_faces):
             break
 
     return identified, mapped
+
+
+def remove_feats(seqs):
+    for i in range(len(seqs)):
+        seqs[i] = [face['bbox'] for face in seqs[i]]
+    return seqs
