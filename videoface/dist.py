@@ -23,11 +23,11 @@ def face_dist(f1, f2):
 # TODO: try not to loop over every face and sequence => n^2
 def get_dists(prev_faces, next_faces):
     dists = []
-    for seq in prev_faces:
+    for pf in prev_faces:
         face_dists = []
 
-        for i, face in enumerate(next_faces):
-            face_dists.append((i, face_dist(seq, face)))
+        for i, nf in enumerate(next_faces):
+            face_dists.append((i, face_dist(pf, nf)))
         face_dists.sort(key=lambda x: x[1])
         dists.append(face_dists)
 
@@ -45,6 +45,9 @@ def map_faces(prev_faces, next_faces):
         for dist in face_dists:  # TODO: minimize total cost over entire set
             if dist[1] > score_threshold:   # Only accepting scores lower than the threshold
                 break
+
+            if dist[0] > len(next_faces)-1:
+                print("this shouldn't have happened", dist[0], identified)
 
             if identified[dist[0]] == -1:   # Using the sequence with lowest distance
                 identified[dist[0]] = i

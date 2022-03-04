@@ -8,6 +8,22 @@ from .face_recognition import process, compare
 
 
 class NextList:
+    """
+    A sorted list with the ability to get the next element in the list efficiently.
+
+    ...
+
+    Attributes
+    ----------
+
+
+    Returns:
+        _type_: _description_
+
+    Yields:
+        _type_: _description_
+    """
+
     def __init__(self):
         self.list = []
 
