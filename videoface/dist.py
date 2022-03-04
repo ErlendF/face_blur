@@ -20,12 +20,13 @@ def face_dist(f1, f2):
     return fd + bd
 
 
-def get_dists(seqs, faces):  # TODO: try not to loop over every face and sequence => n^2
+# TODO: try not to loop over every face and sequence => n^2
+def get_dists(prev_faces, next_faces):
     dists = []
-    for seq in seqs:
+    for seq in prev_faces:
         face_dists = []
 
-        for i, face in enumerate(faces):
+        for i, face in enumerate(next_faces):
             face_dists.append((i, face_dist(seq, face)))
         face_dists.sort(key=lambda x: x[1])
         dists.append(face_dists)
@@ -33,10 +34,11 @@ def get_dists(seqs, faces):  # TODO: try not to loop over every face and sequenc
     return dists
 
 
-def map_faces(seqs, faces):  # seqs should be the last face in each sequence
-    dists = get_dists(seqs, faces)
-    # list of which sequences gets faces mapped to it
-    identified = [-1] * len(seqs)
+def map_faces(prev_faces, next_faces):
+    dists = get_dists(prev_faces, next_faces)
+
+    # List mapping the new faces to the previous faces, -1 is not mapped
+    identified = [-1] * len(next_faces)
 
     # Looping over the distances to map faces to previous sequences
     for i, face_dists in enumerate(dists):
