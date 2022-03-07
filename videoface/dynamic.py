@@ -117,12 +117,12 @@ def make_sequences(frames_by_nr, matchings, frame_diff_threshold=40):
     prev = -1
     finished_seqs = []
     seq_mapping = {}
-    frame_diff_threshold = 40
 
     for frame_nr, faces in frames_by_nr:
         if prev == -1:
             prev = frame_nr
-            finished_seqs.append(faces)
+            if len(faces) != 0:
+                finished_seqs.append(faces)
             for i in range(len(finished_seqs)):
                 seq_mapping[i] = i
             continue
