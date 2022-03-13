@@ -1,31 +1,25 @@
-def interpolate(seqs):
-    to_add = []
+import numpy as np
+from scipy.interpolate import pchip_interpolate
 
+
+def interpolate(seqs, interpolator=pchip_interpolate):
     for i in range(len(seqs)):
-        prev_frame = -1
-        for j, s in enumerate(seqs[i]):
-            if prev_frame == -1:    # No previous frames to interpolate
-                prev_frame = s[4]
-                continue
+        x1_observed = [f[0] for f in seqs[i]]
+        y1_observed = [f[1] for f in seqs[i]]
+        x2_observed = [f[2] for f in seqs[i]]
+        y2_observed = [f[3] for f in seqs[i]]
+        frame_nrs = [f[4] for f in seqs[i]]
 
-            if s[4] == prev_frame+1:    # No frames between to interpolate
-                prev_frame = s[4]
-                continue
+        # +1 to make inclusive
+        x_pred = np.arange(seqs[i][0][4], seqs[i][-1][4]+1)
 
-            frame_diff = s[4] - prev_frame
-            new_faces = []
-            for idx, k in enumerate(range(prev_frame, s[4]-1)):
-                new = [0, 0, 0, 0, k+1]
-                for l in range(4):
-                    new[l] = seqs[i][j - 1][l] + \
-                        ((idx + 1) *
-                         ((seqs[i][j][l] - seqs[i][j - 1][l]) / frame_diff))
-                new_faces.append(new)
+        # Interpolating each value separately
+        x1_pred = interpolator(frame_nrs, x1_observed, x_pred)
+        y1_pred = interpolator(frame_nrs, y1_observed, x_pred)
+        x2_pred = interpolator(frame_nrs, x2_observed, x_pred)
+        y2_pred = interpolator(frame_nrs, y2_observed, x_pred)
 
-            to_add.append((i, j, new_faces))
-            prev_frame = s[4]
-
-    for i, j, v in reversed(to_add):
-        seqs[i] = seqs[i][:j] + v + seqs[i][j:]
-
+        # Replacing sequence with fully interpolated sequence
+        seqs[i] = [[x1, y1, x2, y2, nr] for x1, y1, x2, y2,
+                   nr in zip(x1_pred, y1_pred, x2_pred, y2_pred, x_pred)]
     return seqs
