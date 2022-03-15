@@ -45,12 +45,14 @@ class NextList:
         return self.list[i+1][0]
 
 
-def dynamically_process(img_dir, max_interval=25, batch_size=32, frame_diff_threshold=40):
-    interval = max_interval//2
-    add_next = 0
+def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6):
+    interval = (min_interval + max_interval)//2
+    process_consequtively = 0
+
     current = 0
-    complete = -1
     prev = -1
+    complete = -1
+    add_next = 0
 
     imgs = []
     img_nrs = []
@@ -58,9 +60,11 @@ def dynamically_process(img_dir, max_interval=25, batch_size=32, frame_diff_thre
     frames_by_nr = NextList()
 
     # Finding the last frame
-    last_frame = sorted(glob(join(img_dir, "*.png")))[-1]
+    last_frame = sorted(glob(join(img_dir, "*." + file_ext)))[-1]
+
+    # +1 for / and . in filename, -1 to make the frame numbers 0-indexed
     last_frame = int(
-        last_frame[len(img_dir)+1+len("img"):len(last_frame)-len(".png")]) - 1
+        last_frame[len(img_dir)+1+len("img"):len(last_frame)-(len(file_ext)+1)]) - 1
 
     # Looping until the entire video is processed
     while True:
@@ -68,17 +72,17 @@ def dynamically_process(img_dir, max_interval=25, batch_size=32, frame_diff_thre
             break
 
         if add_next > last_frame:
-            # Reached the last frame
-            add_next = last_frame
+            # Reached the last frame, setting add_next to -1 to mark it as done
+            add_next = -1
             imgs.append(read_frame(last_frame, img_dir))
             img_nrs.append(last_frame)
-        elif len(imgs) < batch_size:
+        elif add_next >= 0 and len(imgs) < batch_size:
             # Adding the next frame to the list
             imgs.append(read_frame(add_next, img_dir))
             img_nrs.append(add_next)
             add_next += interval
 
-        if len(imgs) >= batch_size or add_next == last_frame:
+        if len(imgs) >= batch_size or add_next < 0:
             # Processing the queued images
             frames = process(imgs, img_nrs)
             for k, v in frames.items():
@@ -117,9 +121,19 @@ def dynamically_process(img_dir, max_interval=25, batch_size=32, frame_diff_thre
                         img_nrs.append(frame_nr)
 
                     current = prev+1    # Setting back the current
-                    interval /= 2       # Reducing the interval
+                    # Reducing the interval
+                    interval = max(int(interval*0.7), min_interval)
+                    process_consequtively = 0
                     break
                 else:
+                    if current != prev+1:
+                        # If enough frames have been successfully processed consequtively, increasing the interval
+                        if process_consequtively >= proc_count_treshold:
+                            interval = min(int(interval*1.3), max_interval)
+                            process_consequtively = 0
+                        else:
+                            process_consequtively += 1
+
                     # Storing the matching and updating completed
                     matchings[(prev, current)] = matches
                     complete = current
