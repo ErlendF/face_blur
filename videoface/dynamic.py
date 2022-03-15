@@ -1,5 +1,5 @@
 from bisect import insort_right, bisect_left
-from os import path
+from os.path import join
 from glob import glob
 
 from .file import read_frame
@@ -58,7 +58,7 @@ def dynamically_process(img_dir, max_interval=25, batch_size=32, frame_diff_thre
     frames_by_nr = NextList()
 
     # Finding the last frame
-    last_frame = sorted(glob(path.join(img_dir, "*.png")))[-1]
+    last_frame = sorted(glob(join(img_dir, "*.png")))[-1]
     last_frame = int(
         last_frame[len(img_dir)+1+len("img"):len(last_frame)-len(".png")]) - 1
 
