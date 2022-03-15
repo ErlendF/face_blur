@@ -45,7 +45,8 @@ class NextList:
         return self.list[i+1][0]
 
 
-def dynamically_process(img_dir, interval=15, batch_size=32, frame_diff_threshold=40):
+def dynamically_process(img_dir, max_interval=25, batch_size=32, frame_diff_threshold=40):
+    interval = max_interval//2
     add_next = 0
     current = 0
     complete = -1
@@ -56,31 +57,35 @@ def dynamically_process(img_dir, interval=15, batch_size=32, frame_diff_threshol
     matchings = {}
     frames_by_nr = NextList()
 
+    # Finding the last frame
     last_frame = sorted(glob(path.join(img_dir, "*.png")))[-1]
     last_frame = int(
-        last_frame[len(img_dir)+1+len("img"):len(last_frame)-len(".png")])-1
+        last_frame[len(img_dir)+1+len("img"):len(last_frame)-len(".png")]) - 1
 
+    # Looping until the entire video is processed
     while True:
-        if complete == last_frame:
+        if complete == last_frame:  # Completed all frames
             break
 
         if add_next > last_frame:
-            if complete == last_frame:
-                break
-
+            # Reached the last frame
             add_next = last_frame
             imgs.append(read_frame(last_frame, img_dir))
             img_nrs.append(last_frame)
-        elif add_next != last_frame and len(imgs) < batch_size:
+        elif len(imgs) < batch_size:
+            # Adding the next frame to the list
             imgs.append(read_frame(add_next, img_dir))
             img_nrs.append(add_next)
             add_next += interval
 
         if len(imgs) >= batch_size or add_next == last_frame:
+            # Processing the queued images
             frames = process(imgs, img_nrs)
             for k, v in frames.items():
+                # Storing the processed information for future use
                 frames_by_nr[k] = v
 
+            # Cleaning up processed images
             imgs = []
             img_nrs = []
 
@@ -88,10 +93,13 @@ def dynamically_process(img_dir, interval=15, batch_size=32, frame_diff_threshol
                 current = frames_by_nr.next_key(0)
                 prev = 0
 
+            # Looping until there is a continuity issue
             while True:
                 if complete == current:
                     new = frames_by_nr.next_key(current)
                     if new is None:
+                        # Processed everything in the queue, increasing the interval
+                        interval = min(int(interval*1.5), max_interval)
                         break
 
                     prev = current
@@ -99,15 +107,20 @@ def dynamically_process(img_dir, interval=15, batch_size=32, frame_diff_threshol
 
                 matches, matched = compare(
                     frames_by_nr[prev], frames_by_nr[current])
+
+                # If the two frames are adjacent, there is no more exploration to do even if they don't match
                 if not matched and current != prev+1:
+                    # Queueing all frames between the non-matched frames
                     # TODO: more finegrained exploration?
                     for frame_nr in range(prev+1, current):
                         imgs.append(read_frame(frame_nr, img_dir))
                         img_nrs.append(frame_nr)
 
-                    current = prev+1
+                    current = prev+1    # Setting back the current
+                    interval /= 2       # Reducing the interval
                     break
                 else:
+                    # Storing the matching and updating completed
                     matchings[(prev, current)] = matches
                     complete = current
     return frames_by_nr, matchings
