@@ -7,8 +7,12 @@ from matplotlib.pyplot import imsave
 from blur import round_blur
 
 
-def read_frame(nr, dir):
-    return imread(join(dir, "img" + str(nr+1).rjust(7, '0') + ".png"))
+def get_file_name(nr, dir):
+    return join(dir, "img" + str(nr+1).rjust(7, '0') + ".png")
+
+
+def read_frame(filename):
+    return imread(filename)
 
 
 def write_faces(finished_seqs, img_dir, out_dir):

@@ -2,9 +2,9 @@ from bisect import insort_right, bisect_left
 from os.path import join
 from glob import glob
 
-from .file import read_frame
-from .dist import compare_faces
-from .face_recognition import process, compare
+from .file import get_file_name
+from .dist import compare_faces, map_faces
+from .face_recognition import face_recognition_process
 
 
 class NextList:
@@ -45,18 +45,21 @@ class NextList:
         return self.list[i+1][0]
 
 
-def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6):
+def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6, processing_func=face_recognition_process):
+    # Initially setting the search interval to the middle of the min and max
     interval = (min_interval + max_interval)//2
     process_consequtively = 0
 
-    current = 0
-    prev = -1
-    complete = -1
-    add_next = 0
+    current = 0  # The frame currently being processed
+    prev = -1   # The previous frame that was processed
+    complete = -1  # The last completely processed frame
+    add_next = 0    # The next frame to add to the list of frames to be processed
 
-    imgs = []
-    img_nrs = []
-    matchings = {}
+    imgs = []   # Images that should be processed
+    img_nrs = []  # The corresponding frame numbers
+    matchings = {}  # A map of matchings between two frames
+
+    # A map substitute storing the identified bounding boxes and features for each frame
     frames_by_nr = NextList()
 
     # Finding the last frame
@@ -74,17 +77,17 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
         if add_next > last_frame:
             # Reached the last frame, setting add_next to -1 to mark it as done
             add_next = -1
-            imgs.append(read_frame(last_frame, img_dir))
+            imgs.append(get_file_name(last_frame, img_dir))
             img_nrs.append(last_frame)
         elif add_next >= 0 and len(imgs) < batch_size:
             # Adding the next frame to the list
-            imgs.append(read_frame(add_next, img_dir))
+            imgs.append(get_file_name(add_next, img_dir))
             img_nrs.append(add_next)
             add_next += interval
 
         if len(imgs) >= batch_size or add_next < 0:
             # Processing the queued images
-            frames = process(imgs, img_nrs)
+            frames = processing_func(imgs, img_nrs)
             for k, v in frames.items():
                 # Storing the processed information for future use
                 frames_by_nr[k] = v
@@ -117,7 +120,7 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
                     # Queueing all frames between the non-matched frames
                     # TODO: more finegrained exploration?
                     for frame_nr in range(prev+1, current):
-                        imgs.append(read_frame(frame_nr, img_dir))
+                        imgs.append(get_file_name(frame_nr, img_dir))
                         img_nrs.append(frame_nr)
 
                     current = prev+1    # Setting back the current
@@ -221,3 +224,20 @@ def make_sequences(frames_by_nr, matchings, frame_diff_threshold=40):
         finished_seqs) if map_appended_seqs[i] == -1]
 
     return finished_seqs
+
+# [0] => frame number
+# [1] => list of faces in frame
+
+
+def compare(prev_faces, new_faces):
+    if len(prev_faces[1]) != len(new_faces[1]) and new_faces[0] != prev_faces[0] + 1:
+        return [], False   # Shoud get more info
+
+    identified = map_faces(prev_faces[1], new_faces[1])
+    mapped = True
+    for id in identified:
+        if id == -1:
+            mapped = False
+            break
+
+    return identified, mapped

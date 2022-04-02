@@ -7,5 +7,5 @@ setup(
     author='Erlend Fonnes',
     packages=find_packages(),
     install_requires=["numpy", "opencv-python", "matplotlib", "face_recognition",
-                      "ipython", "jupyter", "pandas", "sympy", "nose", "scipy"]
+                      "ipython", "jupyter", "pandas", "sympy", "nose", "scipy", "deepface", "keras", "tensorflow"]
 )

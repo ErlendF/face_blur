@@ -2,8 +2,8 @@ import numpy as np
 from copy import deepcopy
 
 
-def avg_smoothing(seqs, smoothing_length=9):
-    df = smoothing_length//2
+def avg_smoothing(seqs, smoothing_width=9):
+    df = smoothing_width//2
     seq_copy = deepcopy(seqs)
 
     for i in range(len(seqs)):
