@@ -93,7 +93,7 @@ def deep_face_process(img_names, img_nrs):
         img_faces = []
 
         for bbox, feat in zip(regions, embeddings):
-            img_faces.append({"bbox": bbox, "feat": feat})
+            img_faces.append({"bbox": bbox + [img_nr], "feat": feat})
 
         faces[img_nr] = img_faces
 
