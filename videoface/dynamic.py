@@ -27,11 +27,11 @@ class NextList:
     def __init__(self):
         self.list = []
 
-    def __setitem__(self, key, value, lower=0):
-        insort_right(self.list, (key, value), lo=lower, key=lambda f: f[0])
+    def __setitem__(self, key, value):  # , lower=0
+        insort_right(self.list, (key, value), key=lambda f: f[0])
 
-    def __getitem__(self, key, lower=0):
-        i = bisect_left(self.list, key, lo=lower, key=lambda f: f[0])
+    def __getitem__(self, key):  # , lower=0
+        i = bisect_left(self.list, key, key=lambda f: f[0])
         return self.list[i]
 
     def __iter__(self):
@@ -151,8 +151,9 @@ def make_sequences(frames_by_nr, matchings, frame_diff_threshold=40):
     for frame_nr, faces in frames_by_nr:
         if prev == -1:
             prev = frame_nr
-            if len(faces) != 0:
-                finished_seqs.append(faces)
+            for i in range(len(faces)):
+                finished_seqs.append([faces[i]])
+
             for i in range(len(finished_seqs)):
                 seq_mapping[i] = i
             continue
@@ -182,23 +183,28 @@ def make_sequences(frames_by_nr, matchings, frame_diff_threshold=40):
     finished_seqs.sort(key=lambda s: s[0]["bbox"][4])
     map_appended_seqs = [-1] * len(finished_seqs)
 
+    # Finding sequences that are likely the same face and combining them
     for i in range(len(finished_seqs)):
         for j in range(len(finished_seqs)):
-            if i >= j:  # The list is sorted by starting frame
+            # The list is sorted by starting frame
+            if i >= j or map_appended_seqs[j] != -1:
                 continue
 
+            # Checking for strictly increasing frame numbers
             if finished_seqs[i][-1]["bbox"][4] < finished_seqs[j][0]["bbox"][4]:
                 frame_diff = finished_seqs[j][0]["bbox"][4] - \
                     finished_seqs[i][-1]["bbox"][4]
                 if frame_diff > frame_diff_threshold:
                     continue
 
+                # Comparing faces to check for possibly same face
                 likely_same, dist = compare_faces(
                     finished_seqs[i][-1], finished_seqs[j][0])
                 if not likely_same:
                     continue
 
-                add_after = []
+                # The faces are likely the same
+                # Looking for better matches
                 better_found = False
                 for k in range(len(finished_seqs)):
                     if k <= i or k <= j:
@@ -211,6 +217,7 @@ def make_sequences(frames_by_nr, matchings, frame_diff_threshold=40):
                         break
 
                 if better_found:
+                    # A better match was found, skipping
                     continue
 
                 if map_appended_seqs[i] != -1:
