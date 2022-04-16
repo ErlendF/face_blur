@@ -4,6 +4,9 @@ from scipy.interpolate import pchip_interpolate
 
 def interpolate(seqs, interpolator=pchip_interpolate):
     for i in range(len(seqs)):
+        if len(seqs[i]) == 1:
+            continue
+
         x1_observed = [f[0] for f in seqs[i]]
         y1_observed = [f[1] for f in seqs[i]]
         x2_observed = [f[2] for f in seqs[i]]
