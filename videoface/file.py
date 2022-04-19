@@ -58,6 +58,3 @@ def copy_remaining_files(in_dir, out_dir):
 
         if not exists(out_file_path):
             copyfile(filepath, out_file_path)
-
-
-asdfaskdjflkajsd

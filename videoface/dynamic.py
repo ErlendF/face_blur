@@ -234,13 +234,13 @@ def make_sequences(frames_by_nr, matchings, frame_diff_threshold=40):
 
     return finished_seqs
 
-# [0] => frame number
-# [1] => list of faces in frame
+# face[0] => frame number
+# face[1] => list of faces in frame
 
 
 def compare(prev_faces, new_faces):
     if len(prev_faces[1]) != len(new_faces[1]) and new_faces[0] != prev_faces[0] + 1:
-        return [], False   # Shoud get more info
+        return [], False   # There is a difference in the number of faces, and the frames are not adjacent. Shoud get more info
 
     identified = map_faces(prev_faces[1], new_faces[1])
     mapped = True
