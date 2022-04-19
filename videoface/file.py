@@ -45,8 +45,8 @@ def display_bboxes(finished_seqs, img_dir, out_dir):
         out = join(out_dir, file_name)
         img = imread(join(img_dir, file_name))
         for bbox in bboxes:
-            rectangle(img, (bbox[0], bbox[1]),
-                      (bbox[2], bbox[3]), (0, 0, 255), 2)
+            rectangle(img, (int(bbox[0]), int(bbox[1])),
+                      (int(bbox[2]), int(bbox[3])), (0, 0, 255), 2)
 
         imsave(out, img[:, :, ::-1])
 
@@ -58,3 +58,6 @@ def copy_remaining_files(in_dir, out_dir):
 
         if not exists(out_file_path):
             copyfile(filepath, out_file_path)
+
+
+asdfaskdjflkajsd

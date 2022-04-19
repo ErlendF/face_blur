@@ -191,41 +191,43 @@ def make_sequences(frames_by_nr, matchings, frame_diff_threshold=40):
                 continue
 
             # Checking for strictly increasing frame numbers
-            if finished_seqs[i][-1]["bbox"][4] < finished_seqs[j][0]["bbox"][4]:
-                frame_diff = finished_seqs[j][0]["bbox"][4] - \
-                    finished_seqs[i][-1]["bbox"][4]
-                if frame_diff > frame_diff_threshold:
+            if finished_seqs[i][-1]["bbox"][4] >= finished_seqs[j][0]["bbox"][4] or (map_appended_seqs[i] != -1 and finished_seqs[map_appended_seqs[i]][-1]["bbox"][4] >= finished_seqs[j][0]["bbox"][4]):
+                continue
+
+            frame_diff = finished_seqs[j][0]["bbox"][4] - \
+                finished_seqs[i][-1]["bbox"][4]
+            if frame_diff > frame_diff_threshold:
+                continue
+
+            # Comparing faces to check for possibly same face
+            likely_same, dist = compare_faces(
+                finished_seqs[i][-1], finished_seqs[j][0])
+            if not likely_same:
+                continue
+
+            # The faces are likely the same
+            # Looking for better matches
+            better_found = False
+            for k in range(len(finished_seqs)):
+                if k <= i or k <= j:
                     continue
 
-                # Comparing faces to check for possibly same face
-                likely_same, dist = compare_faces(
-                    finished_seqs[i][-1], finished_seqs[j][0])
-                if not likely_same:
-                    continue
+                likely_same, new_dist = compare_faces(
+                    finished_seqs[i][-1], finished_seqs[k][0])
+                if likely_same and new_dist < dist and finished_seqs[k][0]["bbox"][4] <= finished_seqs[j][-1]["bbox"][4] and finished_seqs[k][0]["bbox"][4] - finished_seqs[i][-1]["bbox"][4] < frame_diff_threshold:
+                    better_found = True  # Found better sequence that doesn't fit with the other proposal
+                    break
 
-                # The faces are likely the same
-                # Looking for better matches
-                better_found = False
-                for k in range(len(finished_seqs)):
-                    if k <= i or k <= j:
-                        continue
+            if better_found:
+                # A better match was found, skipping
+                continue
 
-                    likely_same, new_dist = compare_faces(
-                        finished_seqs[i][-1], finished_seqs[k][0])
-                    if likely_same and new_dist < dist and finished_seqs[k][0]["bbox"][4] <= finished_seqs[j][-1]["bbox"][4] and finished_seqs[k][0]["bbox"][4] - finished_seqs[i][-1]["bbox"][4] < frame_diff_threshold:
-                        better_found = True  # Found better sequence that doesn't fit with the other proposal
-                        break
+            if map_appended_seqs[i] != -1:
+                map_appended_seqs[j] = map_appended_seqs[i]
+            else:
+                map_appended_seqs[j] = i
 
-                if better_found:
-                    # A better match was found, skipping
-                    continue
-
-                if map_appended_seqs[i] != -1:
-                    map_appended_seqs[j] = map_appended_seqs[i]
-                else:
-                    map_appended_seqs[j] = i
-
-                finished_seqs[map_appended_seqs[j]] += finished_seqs[j]
+            finished_seqs[map_appended_seqs[j]] += finished_seqs[j]
 
     finished_seqs = [seq for i, seq in enumerate(
         finished_seqs) if map_appended_seqs[i] == -1]
