@@ -44,7 +44,20 @@ class NextList:
             return None
         return self.list[i+1][0]
 
+    def between(self, start, end):
+        if start > end:
+            start, end = end, start
 
+        i = bisect_left(self.list, start, key=lambda f: f[0])
+        if i == len(self.list):
+            return False
+
+        if self.list[i][0] <= end:
+            return True
+        return False
+
+
+# TODO: add scene changes
 def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6, processing_func=face_recognition_process):
     # Initially setting the search interval to the middle of the min and max
     interval = (min_interval + max_interval)//2
@@ -143,7 +156,7 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
     return frames_by_nr, matchings
 
 
-def make_sequences(frames_by_nr, matchings, frame_diff_threshold=40):
+def make_sequences(frames_by_nr, matchings, scene_changes=None, frame_diff_threshold=40):
     prev = -1
     finished_seqs = []
     seq_mapping = {}
@@ -159,17 +172,17 @@ def make_sequences(frames_by_nr, matchings, frame_diff_threshold=40):
             continue
 
         matching = matchings[(prev, frame_nr)]
-        prev = frame_nr
         new_seq_mapping = {}
-
         used_list = [False]*len(faces)
-        for i, m in enumerate(matching):
-            if m == -1:
-                continue
 
-            used_list[m] = True
-            finished_seqs[seq_mapping[i]].append(faces[m])
-            new_seq_mapping[m] = seq_mapping[i]
+        if scene_changes is None or scene_changes.between(prev, frame_nr):
+            for i, m in enumerate(matching):
+                if m == -1:
+                    continue
+
+                used_list[m] = True
+                finished_seqs[seq_mapping[i]].append(faces[m])
+                new_seq_mapping[m] = seq_mapping[i]
 
         for i, used in enumerate(used_list):
             if used:
@@ -179,6 +192,7 @@ def make_sequences(frames_by_nr, matchings, frame_diff_threshold=40):
             new_seq_mapping[i] = len(finished_seqs)-1
 
         seq_mapping = new_seq_mapping
+        prev = frame_nr
 
     finished_seqs.sort(key=lambda s: s[0]["bbox"][4])
     map_appended_seqs = [-1] * len(finished_seqs)
@@ -199,6 +213,9 @@ def make_sequences(frames_by_nr, matchings, frame_diff_threshold=40):
             if frame_diff > frame_diff_threshold:
                 continue
 
+            if scene_changes is not None and scene_changes.between(finished_seqs[i][-1]["bbox"][4], finished_seqs[j][0]["bbox"][4]):
+                continue
+
             # Comparing faces to check for possibly same face
             likely_same, dist = compare_faces(
                 finished_seqs[i][-1], finished_seqs[j][0])
@@ -215,6 +232,9 @@ def make_sequences(frames_by_nr, matchings, frame_diff_threshold=40):
                 likely_same, new_dist = compare_faces(
                     finished_seqs[i][-1], finished_seqs[k][0])
                 if likely_same and new_dist < dist and finished_seqs[k][0]["bbox"][4] <= finished_seqs[j][-1]["bbox"][4] and finished_seqs[k][0]["bbox"][4] - finished_seqs[i][-1]["bbox"][4] < frame_diff_threshold:
+                    if scene_changes is not None and scene_changes.between(finished_seqs[i][-1]["bbox"][4], finished_seqs[k][0]["bbox"][4]):
+                        continue
+
                     better_found = True  # Found better sequence that doesn't fit with the other proposal
                     break
 
