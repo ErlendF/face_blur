@@ -5,19 +5,7 @@ import cv2
 import numpy as np
 
 import tensorflow as tf
-tf_version = tf.__version__
-tf_major_version = int(tf_version.split(".")[0])
-tf_minor_version = int(tf_version.split(".")[1])
-
-if tf_major_version == 1:
-    import keras
-    from keras.preprocessing.image import load_img, save_img, img_to_array
-    from keras.applications.imagenet_utils import preprocess_input
-    from keras.preprocessing import image
-elif tf_major_version == 2:
-    from tensorflow.keras.preprocessing.image import load_img, save_img, img_to_array
-    from tensorflow.keras.applications.imagenet_utils import preprocess_input
-    from tensorflow.keras.preprocessing import image
+from tensorflow.keras.preprocessing import image
 
 detector_backend = "retinaface"
 model_name = "VGG-Face"

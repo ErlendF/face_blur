@@ -61,7 +61,7 @@ class NextList:
         return False
 
 
-def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6, processing_func=face_recognition_process, scene_changes=None):
+def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6, processing_func=face_recognition_process, shot_transitions=None):
     # Initially setting the search interval to the middle of the min and max
     interval = (min_interval + max_interval)//2
     process_consequtively = 0
@@ -99,8 +99,8 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
             # Adding the next frame to the list
             imgs.append(get_file_name(add_next, img_dir))
             img_nrs.append(add_next)
-            if scene_changes is not None:
-                next_sc = scene_changes.next_key(add_next)
+            if shot_transitions is not None:
+                next_sc = shot_transitions.next_key(add_next)
                 if next_sc is None:
                     add_next += interval
                 elif next_sc == add_next+1:
@@ -171,7 +171,7 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
     return frames_by_nr, matchings
 
 
-def make_sequences(frames_by_nr, matchings, scene_changes=None, frame_diff_threshold=40):
+def make_sequences(frames_by_nr, matchings, shot_transitions=None, frame_diff_threshold=40):
     prev = -1
     finished_seqs = []
     seq_mapping = {}
@@ -190,7 +190,7 @@ def make_sequences(frames_by_nr, matchings, scene_changes=None, frame_diff_thres
         new_seq_mapping = {}
         used_list = [False]*len(faces)
 
-        if scene_changes is None or scene_changes.between(prev, frame_nr):
+        if shot_transitions is None or shot_transitions.between(prev, frame_nr):
             for i, m in enumerate(matching):
                 if m == -1:
                     continue
@@ -228,7 +228,7 @@ def make_sequences(frames_by_nr, matchings, scene_changes=None, frame_diff_thres
             if frame_diff > frame_diff_threshold:
                 continue
 
-            if scene_changes is not None and scene_changes.between(finished_seqs[i][-1]["bbox"][4], finished_seqs[j][0]["bbox"][4]):
+            if shot_transitions is not None and shot_transitions.between(finished_seqs[i][-1]["bbox"][4], finished_seqs[j][0]["bbox"][4]):
                 continue
 
             # Comparing faces to check for possibly same face
@@ -247,7 +247,7 @@ def make_sequences(frames_by_nr, matchings, scene_changes=None, frame_diff_thres
                 likely_same, new_dist = compare_faces(
                     finished_seqs[i][-1], finished_seqs[k][0])
                 if likely_same and new_dist < dist and finished_seqs[k][0]["bbox"][4] <= finished_seqs[j][-1]["bbox"][4] and finished_seqs[k][0]["bbox"][4] - finished_seqs[i][-1]["bbox"][4] < frame_diff_threshold:
-                    if scene_changes is not None and scene_changes.between(finished_seqs[i][-1]["bbox"][4], finished_seqs[k][0]["bbox"][4]):
+                    if shot_transitions is not None and shot_transitions.between(finished_seqs[i][-1]["bbox"][4], finished_seqs[k][0]["bbox"][4]):
                         continue
 
                     better_found = True  # Found better sequence that doesn't fit with the other proposal
