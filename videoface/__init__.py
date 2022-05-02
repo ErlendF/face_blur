@@ -5,6 +5,7 @@ from .file import read_frame, write_faces, copy_remaining_files, display_bboxes
 from .face_recognition import face_recognition_process
 from .feats import remove_feats
 from .deep_face import deep_face_process
+from .scene_changes import get_scene_changes
 
 __all__ = ["map_faces", "compare_faces", "interpolate", "face_recognition_process", "compare",
-           "dynamically_process", "make_sequences", "read_frame", "write_faces", "remove_feats", "copy_remaining_files", "deep_face_process", "display_bboxes"]
+           "dynamically_process", "make_sequences", "read_frame", "write_faces", "remove_feats", "copy_remaining_files", "deep_face_process", "display_bboxes", "get_scene_changes"]

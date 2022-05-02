@@ -40,9 +40,13 @@ class NextList:
 
     def next_key(self, key):
         i = bisect_left(self.list, key, key=lambda f: f[0])
-        if i == len(self.list)-1:
+        if i >= len(self.list)-1:
             return None
-        return self.list[i+1][0]
+
+        if self.list[i][0] == key:
+            return self.list[i+1][0]
+
+        return self.list[i][0]
 
     def between(self, start, end):
         if start > end:
@@ -57,8 +61,7 @@ class NextList:
         return False
 
 
-# TODO: add scene changes
-def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6, processing_func=face_recognition_process):
+def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6, processing_func=face_recognition_process, scene_changes=None):
     # Initially setting the search interval to the middle of the min and max
     interval = (min_interval + max_interval)//2
     process_consequtively = 0
@@ -87,7 +90,7 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
         if complete == last_frame:  # Completed all frames
             break
 
-        if add_next > last_frame:
+        if add_next >= last_frame:
             # Reached the last frame, setting add_next to -1 to mark it as done
             add_next = -1
             imgs.append(get_file_name(last_frame, img_dir))
@@ -96,7 +99,19 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
             # Adding the next frame to the list
             imgs.append(get_file_name(add_next, img_dir))
             img_nrs.append(add_next)
-            add_next += interval
+            if scene_changes is not None:
+                next_sc = scene_changes.next_key(add_next)
+                if next_sc is None:
+                    add_next += interval
+                elif next_sc == add_next+1:
+                    add_next = next_sc
+                elif next_sc < add_next + interval:
+                    add_next = next_sc-1
+                else:
+                    add_next += interval
+
+            else:
+                add_next += interval
 
         if len(imgs) >= batch_size or add_next < 0:
             # Processing the queued images
