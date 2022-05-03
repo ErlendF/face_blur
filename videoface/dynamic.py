@@ -176,7 +176,9 @@ def make_sequences(frames_by_nr, matchings, shot_transitions=None, frame_diff_th
     finished_seqs = []
     seq_mapping = {}
 
+    # Making initial facial sequences
     for frame_nr, faces in frames_by_nr:
+        # For the first frame, there is no existing sequences to map faces to
         if prev == -1:
             prev = frame_nr
             for i in range(len(faces)):
@@ -190,7 +192,8 @@ def make_sequences(frames_by_nr, matchings, shot_transitions=None, frame_diff_th
         new_seq_mapping = {}
         used_list = [False]*len(faces)
 
-        if shot_transitions is None or shot_transitions.between(prev, frame_nr):
+        # If there is no shot transition, checking matchings between previous and current frame
+        if shot_transitions is None or not shot_transitions.between(prev, frame_nr):
             for i, m in enumerate(matching):
                 if m == -1:
                     continue
@@ -199,6 +202,7 @@ def make_sequences(frames_by_nr, matchings, shot_transitions=None, frame_diff_th
                 finished_seqs[seq_mapping[i]].append(faces[m])
                 new_seq_mapping[m] = seq_mapping[i]
 
+        # Making new sequences for every face not mapped to an existing sequence
         for i, used in enumerate(used_list):
             if used:
                 continue
