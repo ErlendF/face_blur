@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial.distance import cosine
 
 # Bboxes from arcface: [x1, y1, x2, y2, certainty]
 score_threshold = 2
@@ -11,7 +12,7 @@ def bbox_dist(f1, f2):
 
 
 def feat_dist(f1, f2):
-    return np.sum(np.square(np.array(f1['feat'])-np.array(f2['feat'])))
+    return cosine(f1['feat'], f2['feat'])
 
 
 def face_dist(f1, f2):
