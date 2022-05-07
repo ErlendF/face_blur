@@ -11,8 +11,14 @@ def full_process(img_dir, file_ext="png", processing_func=face_recognition_proce
     img_nrs = []
     frames_by_nr = NextList()
     matchings = {}
+
+    # Iterating through every image and processing them
     for filepath in sorted(glob(join(img_dir, "*" + file_ext))):
-        if len(imgs) >= batch_size:
+        imgs.append(filepath)
+        img_nrs.append(int(filepath.split(
+            "/")[-1].removeprefix("img").removesuffix("." + file_ext))-1)
+
+        if len(imgs) >= batch_size:  # Batch size reached, processing
             frames = processing_func(imgs, img_nrs)
             for k, v in frames.items():
                 frames_by_nr[k] = v
@@ -20,9 +26,14 @@ def full_process(img_dir, file_ext="png", processing_func=face_recognition_proce
             imgs = []
             img_nrs = []
 
-        imgs.append(filepath)
-        img_nrs.append(int(filepath.split(
-            "/")[-1].removeprefix("img").removesuffix("." + file_ext))-1)
+    # Processing unhandled images
+    if len(imgs) != 0:
+        frames = processing_func(imgs, img_nrs)
+        for k, v in frames.items():
+            frames_by_nr[k] = v
+
+        imgs = []
+        img_nrs = []
 
     for i in range(1, len(frames_by_nr)):
         matchings[(i-1, i)], _ = compare(frames_by_nr[i-1], frames_by_nr[i])
