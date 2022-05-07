@@ -1,6 +1,6 @@
 from .dist import map_faces, compare_faces, compare
 from .interpolate import interpolate
-from .dynamic import dynamically_process
+from .dynamic_processing import dynamically_process
 from .facial_sequences import make_sequences
 from .file import read_frame, write_faces, copy_remaining_files, display_bboxes
 from .face_recognition import face_recognition_process

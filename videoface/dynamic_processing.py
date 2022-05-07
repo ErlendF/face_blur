@@ -1,64 +1,10 @@
-from bisect import insort_right, bisect_left
 from os.path import join
 from glob import glob
 
 from .file import get_file_name
 from .dist import compare
+from .next_list import NextList
 from .face_recognition import face_recognition_process
-
-
-class NextList:
-    """
-    A sorted list with the ability to get the next element in the list efficiently.
-
-    ...
-
-    Attributes
-    ----------
-
-
-    Returns:
-        _type_: _description_
-
-    Yields:
-        _type_: _description_
-    """
-
-    def __init__(self):
-        self.list = []
-
-    def __setitem__(self, key, value):  # , lower=0
-        insort_right(self.list, (key, value), key=lambda f: f[0])
-
-    def __getitem__(self, key):  # , lower=0
-        i = bisect_left(self.list, key, key=lambda f: f[0])
-        return self.list[i]
-
-    def __iter__(self):
-        for v in self.list:
-            yield v
-
-    def next_key(self, key):
-        i = bisect_left(self.list, key, key=lambda f: f[0])
-        if i >= len(self.list)-1:
-            return None
-
-        if self.list[i][0] == key:
-            return self.list[i+1][0]
-
-        return self.list[i][0]
-
-    def between(self, start, end):
-        if start > end:
-            start, end = end, start
-
-        i = bisect_left(self.list, start, key=lambda f: f[0])
-        if i == len(self.list):
-            return False
-
-        if self.list[i][0] <= end:
-            return True
-        return False
 
 
 def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6, processing_func=face_recognition_process, shot_transitions=None):
