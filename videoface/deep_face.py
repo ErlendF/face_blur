@@ -8,7 +8,7 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 
 detector_backend = "retinaface"
-model_name = "FaceNet512"
+model_name = "Facenet512"
 face_detector = FaceDetector.build_model(detector_backend)
 model = DeepFace.build_model(model_name)
 
