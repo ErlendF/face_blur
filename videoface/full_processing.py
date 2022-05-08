@@ -35,6 +35,7 @@ def full_process(img_dir, file_ext="png", processing_func=face_recognition_proce
         imgs = []
         img_nrs = []
 
+    # Comparing every frame to find matchings
     for i in range(1, len(frames_by_nr)):
         matchings[(i-1, i)], _ = compare(frames_by_nr[i-1], frames_by_nr[i])
 

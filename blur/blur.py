@@ -1,5 +1,7 @@
-import cv2
-import math
+from cv2 import rectangle, imread, cvtColor, convertScaleAbs, GaussianBlur, medianBlur, circle, LINE_AA, COLOR_GRAY2BGR
+from matplotlib.pyplot import imsave
+from math import sqrt
+from os.path import join
 import numpy as np
 
 
@@ -9,8 +11,8 @@ def alphaBlend(img1, img2, mask):   # source: https://stackoverflow.com/a/482748
     if mask.ndim == 3 and mask.shape[-1] == 3:
         alpha = mask/255.0
     else:
-        alpha = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)/255.0
-    blended = cv2.convertScaleAbs(img1*(1-alpha) + img2*alpha)
+        alpha = cvtColor(mask, COLOR_GRAY2BGR)/255.0
+    blended = convertScaleAbs(img1*(1-alpha) + img2*alpha)
     return blended
 
 
@@ -25,10 +27,27 @@ def round_blur(img, bboxes):
         w = abs(bb[0] - bb[2])
 
         circle_center = (int((bb[0] + bb[2]) // 2), int((bb[1] + bb[3]) // 2))
-        circle_radius = int(math.sqrt(w * w + h * h) // 2)
-        cv2.circle(mask, circle_center, circle_radius,
-                   (255, 255, 255), -1, cv2.LINE_AA)
+        circle_radius = int(sqrt(w * w + h * h) // 2)
+        circle(mask, circle_center, circle_radius,
+               (255, 255, 255), -1, LINE_AA)
 
-    mask_img = cv2.GaussianBlur(mask, (21, 21), 11)
-    img_all_blurred = cv2.medianBlur(img, 99)
+    mask_img = GaussianBlur(mask, (21, 21), 11)
+    img_all_blurred = medianBlur(img, 99)
     return alphaBlend(img, img_all_blurred, mask_img)
+
+
+def write_blured_faces(finished_seqs, img_dir, out_dir):
+    faces_by_nr = {}
+    for seq in finished_seqs:
+        for face in seq:
+            if face["bbox"][4] in faces_by_nr:
+                faces_by_nr[face["bbox"][4]].append(face["bbox"])
+            else:
+                faces_by_nr[face["bbox"][4]] = [face["bbox"]]
+
+    for frame_nr, bboxes in faces_by_nr.items():
+        file_name = "img" + str(frame_nr+1).rjust(7, '0') + ".png"
+        out = join(out_dir, file_name)
+        img = imread(join(img_dir, file_name))
+
+        imsave(out, round_blur(img, bboxes)[:, :, ::-1])
