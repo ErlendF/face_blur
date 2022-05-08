@@ -80,11 +80,7 @@ def deep_face_process(img_names, img_nrs):
 
         pixels_len[img_nr] = len(pixels)
         if len(pixels) != 0:
-            pixels = np.array(pixels)  # .squeeze(axis=0)
-
-            # FaceNet2018 Normalization https://github.com/serengil/deepface/blob/fb68d4a8f816a9cbea488f4dc24c16b78ac3d9b2/deepface/commons/functions.py#L126
-            pixels /= 127.5
-            pixels -= 1
+            pixels = np.array(pixels)
 
             if len(pixels_con) == 0:
                 pixels_con = pixels
