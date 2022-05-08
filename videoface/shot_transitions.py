@@ -4,7 +4,7 @@ from os.path import join
 import numpy as np
 from transnetv2 import TransNetV2
 
-from .dynamic import NextList
+from .next_list import NextList
 
 model = TransNetV2()
 
