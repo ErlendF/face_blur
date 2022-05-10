@@ -3,10 +3,10 @@ from os.path import join
 
 from .next_list import NextList
 from .dist import compare
-from .face_recognition import face_recognition_process
+from .deep_face import deep_face_process
 
 
-def full_process(img_dir, file_ext="png", processing_func=face_recognition_process, batch_size=32):
+def full_process(img_dir, file_ext="png", processing_func=deep_face_process, batch_size=32):
     imgs = []
     img_nrs = []
     frames_by_nr = NextList()

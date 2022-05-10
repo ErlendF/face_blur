@@ -4,10 +4,10 @@ from glob import glob
 from .file import get_file_name
 from .dist import compare
 from .next_list import NextList
-from .face_recognition import face_recognition_process
+from .deep_face import deep_face_process
 
 
-def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6, processing_func=face_recognition_process, shot_transitions=None):
+def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6, processing_func=deep_face_process, shot_transitions=None):
     # Initially setting the search interval to the middle of the min and max
     interval = (min_interval + max_interval)//2
     process_consequtively = 0
