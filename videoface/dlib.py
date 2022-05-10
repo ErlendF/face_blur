@@ -2,7 +2,7 @@ from face_recognition import batch_face_locations, face_encodings
 from .file import read_frame
 
 
-def face_recognition_process(img_names, img_nrs):
+def dlib_process(img_names, img_nrs):
     imgs = []
     for filename in img_names:
         imgs.append(read_frame(filename))
