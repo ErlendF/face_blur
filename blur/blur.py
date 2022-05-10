@@ -34,20 +34,3 @@ def round_blur(img, bboxes):
     mask_img = GaussianBlur(mask, (21, 21), 11)
     img_all_blurred = medianBlur(img, 99)
     return alphaBlend(img, img_all_blurred, mask_img)
-
-
-def write_blured_faces(finished_seqs, img_dir, out_dir):
-    faces_by_nr = {}
-    for seq in finished_seqs:
-        for face in seq:
-            if face["bbox"][4] in faces_by_nr:
-                faces_by_nr[face["bbox"][4]].append(face["bbox"])
-            else:
-                faces_by_nr[face["bbox"][4]] = [face["bbox"]]
-
-    for frame_nr, bboxes in faces_by_nr.items():
-        file_name = "img" + str(frame_nr+1).rjust(7, '0') + ".png"
-        out = join(out_dir, file_name)
-        img = imread(join(img_dir, file_name))
-
-        imsave(out, round_blur(img, bboxes)[:, :, ::-1])
