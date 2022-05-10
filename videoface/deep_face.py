@@ -1,11 +1,11 @@
-from .file import read_frame
-from deepface import DeepFace
-from deepface.detectors import FaceDetector
-from cv2 import resize, cvtColor, COLOR_BGR2GRAY
-import numpy as np
-
-import tensorflow as tf
 from tensorflow.keras.preprocessing import image
+import tensorflow as tf
+import numpy as np
+from cv2 import resize, cvtColor, COLOR_BGR2GRAY
+from deepface.detectors import FaceDetector
+from deepface import DeepFace
+from .file import read_frame
+
 
 detector_backend = "retinaface"
 model_name = "Facenet512"
@@ -15,6 +15,31 @@ model = DeepFace.build_model(model_name)
 
 # Based on https://github.com/serengil/deepface/blob/b13cca851f6415372e7baf988ba6d2098af1297e/deepface/commons/functions.py#L172
 # Altered to get regions and process all faces in the image
+"""
+MIT License
+
+Copyright(c) 2019 Sefik Ilkin Serengil
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files(the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
+
 def preprocess_faces(img, target_size=(224, 224), grayscale=False, enforce_detection=True, detector_backend='opencv', return_region=False, align=True):
     objs = FaceDetector.detect_faces(
         face_detector, detector_backend, img, align)
@@ -75,9 +100,11 @@ def deep_face_process(img_names, img_nrs):
         pixels, regions = preprocess_faces(
             img,
             detector_backend=detector_backend,
+            # The target size depends on the detector backend used
             target_size=(160, 160)
         )
 
+        # Saving the number of faces in the frame
         pixels_len[img_nr] = len(pixels)
         if len(pixels) != 0:
             pixels = np.array(pixels)
@@ -98,6 +125,7 @@ def deep_face_process(img_names, img_nrs):
 
         faces[img_nr] = img_faces
 
+    # Getting facial representations batched
     pred = model.predict(pixels_con.squeeze(axis=1))
     count = 0
     for k, v in pixels_len.items():
