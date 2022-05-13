@@ -15,6 +15,9 @@ def get_shot_transitions(img_dir, file_ext="png", shot_transition_threshold=0.5)
     for filepath in sorted(glob(join(img_dir, "*" + file_ext))):
         st_frames.append(resize(imread(filepath), dsize=(48, 27)))
 
+    if len(st_frames) == 0:
+        return None
+
     st_frames = np.array(st_frames)
     predictions, _ = model.predict_frames(
         st_frames[:, :, :, ::-1])

@@ -53,7 +53,7 @@ def display_bboxes(finished_seqs, img_dir, out_dir):
 
 def copy_remaining_files(in_dir, out_dir):
     for filepath in sorted(glob(join(in_dir, "*.png"))):
-        filename = filepath[len(in_dir)+1:]
+        filename = filepath[len(in_dir):].removeprefix("/")
         out_file_path = join(out_dir, filename)
 
         if not exists(out_file_path):

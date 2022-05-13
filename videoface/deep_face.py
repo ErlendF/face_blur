@@ -115,7 +115,6 @@ def deep_face_process(img_names, img_nrs):
                 pixels_con = np.concatenate((pixels_con, pixels))
 
         img_faces = []
-
         for bbox in regions:
             # Converting from [x, y, width, height] to [x1, y1, x2, y2]
             bbox[2] += bbox[0]

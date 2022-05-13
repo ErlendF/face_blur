@@ -25,6 +25,7 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
     frames_by_nr = NextList()
 
     # Finding the last frame
+    img_dir = img_dir.removesuffix("/")
     last_frame = sorted(glob(join(img_dir, "*." + file_ext)))[-1]
 
     # +1 for / and . in filename, -1 to make the frame numbers 0-indexed
