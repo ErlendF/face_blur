@@ -29,7 +29,7 @@ def init_known_faces(known_people_img_dir, processing_func=deep_face_process):
 
 
 def filter_known_faces(facial_sequences, known_faces, remove_known=False, samples=5, threshold=0.75):
-    comparrisons = [0] * len(facial_sequences)
+    comparisons = [0] * len(facial_sequences)
 
     # Comparing each known face to a sample of each facial sequence
     for i, seq in enumerate(facial_sequences):
@@ -37,8 +37,8 @@ def filter_known_faces(facial_sequences, known_faces, remove_known=False, sample
             if len(seq) < samples:
                 for s in seq:
                     sim = 1-cosine(f, s["feat"])
-                    if sim > comparrisons[i]:
-                        comparrisons[i] = sim
+                    if sim > comparisons[i]:
+                        comparisons[i] = sim
             else:
                 intv = len(seq) // samples
                 if intv < 1:
@@ -46,13 +46,13 @@ def filter_known_faces(facial_sequences, known_faces, remove_known=False, sample
 
                 for k in range(samples):
                     sim = 1-cosine(f, seq[k*intv]["feat"])
-                    if sim > comparrisons[i]:
-                        comparrisons[i] = sim
+                    if sim > comparisons[i]:
+                        comparisons[i] = sim
 
     if remove_known:
-        return [f for f, s in zip(facial_sequences, comparrisons) if s < threshold]
+        return [f for f, s in zip(facial_sequences, comparisons) if s < threshold]
     else:
-        return [f for f, s in zip(facial_sequences, comparrisons) if s >= threshold]
+        return [f for f, s in zip(facial_sequences, comparisons) if s >= threshold]
 
 
 # Filter a selected face based on location and frame number. Use the sequence to identify other sequences with the same face
@@ -121,3 +121,8 @@ def filter_selected_face(sequences, frame_number, x, y, remove_known=True, sampl
         return [s for i, s in enumerate(sequences) if i not in identical]
 
     return [s for i, s in enumerate(sequences) if i in identical]
+
+
+# Used to filter likely false positives
+def filter_short_sequences(seqs, min_length=10):
+    return [s for s in seqs if len(s) >= min_length]

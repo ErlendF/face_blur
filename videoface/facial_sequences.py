@@ -1,7 +1,8 @@
 from .dist import compare_faces
+from .filter_faces import filter_short_sequences
 
 
-def make_sequences(frames_by_nr, matchings, shot_transitions=None, frame_diff_threshold=40):
+def make_sequences(frames_by_nr, matchings, shot_transitions=None, frame_diff_threshold=40, minimum_seq_length=0):
     prev = -1
     finished_seqs = []
     seq_mapping = {}
@@ -42,6 +43,9 @@ def make_sequences(frames_by_nr, matchings, shot_transitions=None, frame_diff_th
 
         seq_mapping = new_seq_mapping
         prev = frame_nr
+
+    finished_seqs = filter_short_sequences(
+        finished_seqs, min_length=minimum_seq_length)
 
     finished_seqs.sort(key=lambda s: s[0]["bbox"][4])
     map_appended_seqs = [-1] * len(finished_seqs)

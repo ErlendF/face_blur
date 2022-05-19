@@ -60,59 +60,61 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
             else:
                 add_next += interval
 
-        if len(imgs) >= batch_size or add_next < 0:
-            # Processing the queued images
-            frames = processing_func(imgs, img_nrs)
-            for k, v in frames.items():
-                # Storing the processed information for future use
-                frames_by_nr[k] = v
+        if len(imgs) < batch_size and add_next >= 0:
+            continue
 
-            # Cleaning up processed images
-            imgs = []
-            img_nrs = []
+        # Processing the queued images
+        frames = processing_func(imgs, img_nrs)
+        for k, v in frames.items():
+            # Storing the processed information for future use
+            frames_by_nr[k] = v
 
-            if current == 0:
-                current = frames_by_nr.next_key(0)
-                prev = 0
+        # Cleaning up processed images
+        imgs = []
+        img_nrs = []
 
-            # Looping until there is a continuity issue
-            while True:
-                if complete == current:
-                    new = frames_by_nr.next_key(current)
-                    if new is None:
-                        # Processed everything in the queue, increasing the interval
-                        interval = min(int(interval*1.5), max_interval)
-                        break
+        if current == 0:
+            current = frames_by_nr.next_key(0)
+            prev = 0
 
-                    prev = current
-                    current = new
-
-                matches, matched = compare(
-                    frames_by_nr[prev], frames_by_nr[current])
-
-                # If the two frames are adjacent, there is no more exploration to do even if they don't match
-                if not matched and current != prev+1:
-                    # Queueing all frames between the non-matched frames
-                    # TODO: more finegrained exploration?
-                    for frame_nr in range(prev+1, current):
-                        imgs.append(get_file_name(frame_nr, img_dir))
-                        img_nrs.append(frame_nr)
-
-                    current = prev+1    # Setting back the current
-                    # Reducing the interval
-                    interval = max(int(interval*0.7), min_interval)
-                    process_consequtively = 0
+        # Looping until there is a continuity issue
+        while True:
+            if complete == current:
+                new = frames_by_nr.next_key(current)
+                if new is None:
+                    # Processed everything in the queue, increasing the interval
+                    interval = min(int(interval*1.5), max_interval)
                     break
-                else:
-                    if current != prev+1:
-                        # If enough frames have been successfully processed consequtively, increasing the interval
-                        if process_consequtively >= proc_count_treshold:
-                            interval = min(int(interval*1.3), max_interval)
-                            process_consequtively = 0
-                        else:
-                            process_consequtively += 1
 
-                    # Storing the matching and updating completed
-                    matchings[(prev, current)] = matches
-                    complete = current
+                prev = current
+                current = new
+
+            matches, matched = compare(
+                frames_by_nr[prev], frames_by_nr[current])
+
+            # If the two frames are adjacent, there is no more exploration to do even if they don't match
+            if not matched and current != prev+1:
+                # Queueing all frames between the non-matched frames
+                # TODO: more finegrained exploration?
+                for frame_nr in range(prev+1, current):
+                    imgs.append(get_file_name(frame_nr, img_dir))
+                    img_nrs.append(frame_nr)
+
+                current = prev+1    # Setting back the current
+                # Reducing the interval
+                interval = max(int(interval*0.7), min_interval)
+                process_consequtively = 0
+                break
+            else:
+                if current != prev+1:
+                    # If enough frames have been successfully processed consequtively, increasing the interval
+                    if process_consequtively >= proc_count_treshold:
+                        interval = min(int(interval*1.3), max_interval)
+                        process_consequtively = 0
+                    else:
+                        process_consequtively += 1
+
+                # Storing the matching and updating completed
+                matchings[(prev, current)] = matches
+                complete = current
     return frames_by_nr, matchings
