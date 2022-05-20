@@ -127,6 +127,9 @@ def deep_face_process(img_names, img_nrs):
 
         faces[img_nr] = img_faces
 
+    if len(pixels_con) == 0:
+        return {}
+
     # Getting facial representations batched
     pred = model.predict(pixels_con.squeeze(axis=1))
     count = 0
