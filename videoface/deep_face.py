@@ -91,6 +91,9 @@ def preprocess_faces(img, target_size=(224, 224), grayscale=False, enforce_detec
 
 
 def deep_face_process(img_names, img_nrs):
+    if len(img_names) == 0:
+        return {}
+
     faces = {}
     pixels_con = []
     pixels_len = {}
