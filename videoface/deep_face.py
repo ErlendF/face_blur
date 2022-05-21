@@ -1,5 +1,4 @@
 from tensorflow.keras.preprocessing import image
-import tensorflow as tf
 import numpy as np
 from cv2 import resize, cvtColor, COLOR_BGR2GRAY
 from deepface.detectors import FaceDetector
@@ -128,7 +127,9 @@ def deep_face_process(img_names, img_nrs):
         faces[img_nr] = img_faces
 
     if len(pixels_con) == 0:
-        return {}
+        for nr in img_nrs:
+            faces[nr] = []
+        return faces
 
     # Getting facial representations batched
     pred = model.predict(pixels_con.squeeze(axis=1))
