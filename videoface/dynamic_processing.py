@@ -48,17 +48,15 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
             img_nrs.append(add_next)
             if shot_transitions is not None:
                 next_sc = shot_transitions.next_key(add_next)
-                if next_sc is None:
-                    add_next += interval
-                elif next_sc == add_next+1:
-                    add_next = next_sc
-                elif next_sc < add_next + interval:
-                    add_next = next_sc-1
-                else:
-                    add_next += interval
+                if next_sc is not None and add_next + interval >= next_sc:
+                    imgs.append(get_file_name(next_sc, img_dir))
+                    img_nrs.append(next_sc)
 
-            else:
-                add_next += interval
+                    if next_sc+1 <= last_frame:
+                        imgs.append(get_file_name(next_sc+1, img_dir))
+                        img_nrs.append(next_sc+1)
+
+            add_next += interval
 
         if len(imgs) < batch_size and add_next >= 0:
             continue

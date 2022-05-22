@@ -21,10 +21,13 @@ class NextList:
 
     def next_key(self, key):
         i = bisect_left(self.list, key, key=lambda f: f[0])
-        if i >= len(self.list)-1:
+        if i > len(self.list)-1:
             return None
 
         if self.list[i][0] == key:
+            if i == len(self.list)-1:
+                return None
+
             return self.list[i+1][0]
 
         return self.list[i][0]
@@ -37,6 +40,6 @@ class NextList:
         if i == len(self.list):
             return False
 
-        if self.list[i][0] <= end:
+        if self.list[i][0] < end:
             return True
         return False
