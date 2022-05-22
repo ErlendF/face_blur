@@ -31,7 +31,7 @@ def write_faces(finished_seqs, img_dir, out_dir):
         imsave(out, img[:, :, ::-1])
 
 
-def display_bboxes(finished_seqs, img_dir, out_dir):
+def display_bboxes(finished_seqs, img_dir, out_dir, color=(0, 0, 255)):
     faces_by_nr = {}
     for seq in finished_seqs:
         for face in seq:
@@ -46,7 +46,7 @@ def display_bboxes(finished_seqs, img_dir, out_dir):
         img = imread(join(img_dir, file_name))
         for bbox in bboxes:
             rectangle(img, (int(bbox[0]), int(bbox[1])),
-                      (int(bbox[2]), int(bbox[3])), (0, 0, 255), 2)
+                      (int(bbox[2]), int(bbox[3])), color, 2)
 
         imsave(out, img[:, :, ::-1])
 
