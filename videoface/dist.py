@@ -37,6 +37,9 @@ def get_dists(prev_faces, next_faces):
 def map_faces(prev_faces, next_faces):
     dists = get_dists(prev_faces, next_faces)
 
+    if len(dists) == 0:
+        return []
+
     # Mapping the new faces to the previous faces
     _, col_ind = linear_sum_assignment(dists)
 
