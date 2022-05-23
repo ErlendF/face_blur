@@ -1,9 +1,10 @@
 import numpy as np
 from scipy.spatial.distance import cosine
+from scipy.optimize import linear_sum_assignment
 
 # Bboxes from arcface: [x1, y1, x2, y2, certainty]
-score_threshold = 2
-feat_weight = 0.8
+score_threshold = 1.0
+feat_weight = 1.0
 bbox_weight = 0.001
 
 
@@ -21,15 +22,13 @@ def face_dist(f1, f2):
     return fd + bd
 
 
-# TODO: try not to loop over every face and sequence => n^2
 def get_dists(prev_faces, next_faces):
     dists = []
     for nf in next_faces:
         face_dists = []
 
-        for i, pf in enumerate(prev_faces):
-            face_dists.append((i, face_dist(pf, nf)))
-        face_dists.sort(key=lambda x: x[1])
+        for pf in prev_faces:
+            face_dists.append(face_dist(pf, nf))
         dists.append(face_dists)
 
     return dists
@@ -38,20 +37,15 @@ def get_dists(prev_faces, next_faces):
 def map_faces(prev_faces, next_faces):
     dists = get_dists(prev_faces, next_faces)
 
-    # List mapping the new faces to the previous faces, -1 is not mapped
-    identified = [-1] * len(prev_faces)
+    # Mapping the new faces to the previous faces
+    _, col_ind = linear_sum_assignment(dists)
 
-    # Looping over the distances to map faces to previous sequences
-    for i, face_dists in enumerate(dists):
-        for dist in face_dists:  # TODO: minimize total cost over entire set
-            if dist[1] > score_threshold:   # Only accepting scores lower than the threshold
-                break
+    # If the mapping exceeds the threshold, setting as -1 (unmapped)
+    for i, c in enumerate(col_ind):
+        if dists[i][c] > score_threshold:
+            col_ind[i] = -1
 
-            if identified[dist[0]] == -1:   # Using the sequence with lowest distance
-                identified[dist[0]] = i
-                break
-
-    return identified
+    return col_ind
 
 
 def compare_faces(f1, f2):
