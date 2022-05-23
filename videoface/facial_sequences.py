@@ -5,7 +5,7 @@ from .filter_faces import filter_short_sequences
 def make_sequences(frames_by_nr, matchings, shot_transitions=None, frame_diff_threshold=40, minimum_seq_length=0):
     prev = -1
     finished_seqs = []
-    seq_mapping = {}
+    seq_mapping = {}    # This is used to keep track of which facial sequence the faces of the previous frames were mapped to
 
     # Making initial facial sequences
     for frame_nr, faces in frames_by_nr:
@@ -20,7 +20,8 @@ def make_sequences(frames_by_nr, matchings, shot_transitions=None, frame_diff_th
             continue
 
         matching = matchings[(prev, frame_nr)]
-        new_seq_mapping = {}
+        new_seq_mapping = {}    # This is used to update seq_mapping after finishing the frame
+        # Keeping track of which faces have already been mapped
         used_list = [False]*len(faces)
 
         # If there is no shot transition, checking matchings between previous and current frame
@@ -29,9 +30,13 @@ def make_sequences(frames_by_nr, matchings, shot_transitions=None, frame_diff_th
                 if m == -1:
                     continue
 
-                used_list[m] = True
-                finished_seqs[seq_mapping[i]].append(faces[m])
-                new_seq_mapping[m] = seq_mapping[i]
+                used_list[i] = True
+
+                # The face is mapped to a face, which has been added to a facial sequence. Adding the face to the same sequence
+                finished_seqs[seq_mapping[m]].append(faces[i])
+
+                # Setting the mapping for the current face
+                new_seq_mapping[i] = seq_mapping[m]
 
         # Making new sequences for every face not mapped to an existing sequence
         for i, used in enumerate(used_list):
@@ -41,6 +46,7 @@ def make_sequences(frames_by_nr, matchings, shot_transitions=None, frame_diff_th
             finished_seqs.append([faces[i]])
             new_seq_mapping[i] = len(finished_seqs)-1
 
+        # Updating mapping and previous frame
         seq_mapping = new_seq_mapping
         prev = frame_nr
 
