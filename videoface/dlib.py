@@ -1,10 +1,9 @@
-from tkinter import image_names
 from face_recognition import batch_face_locations, face_encodings
 from .file import read_frame
 
 
 def dlib_process(img_names, img_nrs):
-    if len(image_names) == 0:
+    if len(img_names) == 0:
         return {}
 
     imgs = []
