@@ -1,5 +1,4 @@
-from cv2 import rectangle, imread, cvtColor, convertScaleAbs, GaussianBlur, medianBlur, circle, LINE_AA, COLOR_GRAY2BGR
-from matplotlib.pyplot import imsave
+from cv2 import cvtColor, convertScaleAbs, GaussianBlur, medianBlur, circle, LINE_AA, COLOR_GRAY2BGR
 from math import sqrt
 from os.path import join
 import numpy as np

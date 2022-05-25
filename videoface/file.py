@@ -1,8 +1,7 @@
-from cv2 import imread, rectangle
+from cv2 import imread, imwrite, rectangle
 from os.path import join, exists
 from glob import glob
 from shutil import copyfile
-from matplotlib.pyplot import imsave
 
 from blur import round_blur
 
@@ -28,7 +27,7 @@ def write_faces(finished_seqs, img_dir, out_dir):
         file_name = "img" + str(frame_nr+1).rjust(7, '0') + ".png"
         out = join(out_dir, file_name)
         img = round_blur(imread(join(img_dir, file_name)), bboxes)
-        imsave(out, img[:, :, ::-1])
+        imwrite(out, img)
 
 
 def display_bboxes(finished_seqs, img_dir, out_dir, color=(0, 0, 255)):
@@ -48,12 +47,12 @@ def display_bboxes(finished_seqs, img_dir, out_dir, color=(0, 0, 255)):
             rectangle(img, (int(bbox[0]), int(bbox[1])),
                       (int(bbox[2]), int(bbox[3])), color, 2)
 
-        imsave(out, img[:, :, ::-1])
+        imwrite(out, img)
 
 
 def copy_remaining_files(in_dir, out_dir):
     for filepath in sorted(glob(join(in_dir, "*.png"))):
-        filename = filepath[len(in_dir):].removeprefix("/")
+        filename = filepath.removeprefix(in_dir).removeprefix("/")
         out_file_path = join(out_dir, filename)
 
         if not exists(out_file_path):

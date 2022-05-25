@@ -55,7 +55,7 @@ def filter_known_faces(facial_sequences, known_faces, remove_known=False, sample
         return [f for f, s in zip(facial_sequences, comparisons) if s >= threshold]
 
 
-# Filter a selected face based on location and frame number. Use the sequence to identify other sequences with the same face
+# Filter a selected face based on location and frame number. Use the sequence to identify other sequences with the same face. x = y = 0 is the top left corner of the frame.
 def filter_selected_face(sequences, frame_number, x, y, remove_known=True, samples=5, threshold=0.75):
     closest_seq = -1
     closest_dist = float_info.max
