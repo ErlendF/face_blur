@@ -1,0 +1,20 @@
+pandas
+numpy
+scipy
+matplotlib
+sympy
+nose
+Pillow
+h5py
+keras_applications
+keras_preprocessing
+mock
+sklearn
+tqdm
+ffmpeg-python
+pyyaml
+opencv-python
+opencv-contrib-python
+shapely
+face_recognition   # requires: https://gist.github.com/ageitgey/629d75c1baac34dfa5ca2a1928a7aeaf
+git+https://github.com/ErlendF/face_blur.git

@@ -1,0 +1,37 @@
+name: face_blur
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pandas
+  - numpy
+  - scipy
+  - matplotlib
+  - tensorflow
+  - sympy
+  - nose
+  - pip
+  - pip:
+    - Pillow
+    - h5py
+    - keras_applications
+    - keras_preprocessing
+    - mock
+    - sklearn
+    - tensorflow-gpu
+    - tqdm
+    - ffmpeg-python
+    - pyyaml
+    - opencv-python
+    - opencv-contrib-python
+    - shapely
+    - dlib
+    - face_recognition   # requires: https://gist.github.com/ageitgey/629d75c1baac34dfa5ca2a1928a7aeaf
+    - git+https://github.com/ErlendF/face_blur.git@1e43ba17cc1aa6e6e7e847408c586ae2b416b922
+    
+    # Installing TransNetV2:
+    # 1. Activate this conda environment
+    # 2. Clone https://github.com/soCzech/TransNetV2 (requires git-lfs)
+    # 3. Run 'python setup.py install' from the root of the repo

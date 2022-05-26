@@ -1,0 +1,7 @@
+multi-model-server
+sagemaker-inference
+numpy
+opencv-python
+Cython
+onnxruntime
+onnxruntime-gpu
