@@ -6,6 +6,6 @@ setup(
     description='ML utilities',
     author='Erlend Fonnes',
     packages=find_packages(),
-    install_requires=["numpy", "opencv-python", "matplotlib",
-                      "pandas", "scipy", "deepface", "keras", "tensorflow>=2.1"]
+    install_requires=["numpy", "opencv-python",
+                      "scipy", "deepface", "keras", "tensorflow>=2.1"]
 )

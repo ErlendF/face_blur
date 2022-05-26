@@ -33,3 +33,14 @@ def round_blur(img, bboxes):
     mask_img = GaussianBlur(mask, (21, 21), 11)
     img_all_blurred = medianBlur(img, 99)
     return alphaBlend(img, img_all_blurred, mask_img)
+
+
+def square_blur(img, bboxes):
+    if bboxes is None:
+        return img
+
+    for bb in bboxes:
+        img[int(bb[1]):int(bb[3]), int(bb[0]):int(bb[2])] = medianBlur(
+            img[int(bb[1]):int(bb[3]), int(bb[0]):int(bb[2])], 99)
+
+    return img

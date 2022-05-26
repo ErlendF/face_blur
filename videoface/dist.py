@@ -3,7 +3,7 @@ from scipy.spatial.distance import cosine
 from scipy.optimize import linear_sum_assignment
 
 # Bboxes from arcface: [x1, y1, x2, y2, certainty]
-score_threshold = 1.0
+dist_threshold = 1.0
 feat_weight = 1.0
 bbox_weight = 0.001
 
@@ -45,7 +45,7 @@ def map_faces(prev_faces, next_faces):
 
     # If the mapping exceeds the threshold, setting as -1 (unmapped)
     for i, c in enumerate(col_ind):
-        if dists[i][c] > score_threshold:
+        if dists[i][c] > dist_threshold:
             col_ind[i] = -1
 
     return col_ind
@@ -53,7 +53,7 @@ def map_faces(prev_faces, next_faces):
 
 def compare_faces(f1, f2):
     dist = face_dist(f1, f2)
-    if dist < score_threshold:
+    if dist < dist_threshold:
         return True, dist
 
     return False, dist
