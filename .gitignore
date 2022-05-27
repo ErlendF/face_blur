@@ -1,2 +1,3 @@
 .vscode
 variables.py
+__pycache__

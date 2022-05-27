@@ -1,4 +1,4 @@
-from cv2 import cvtColor, convertScaleAbs, GaussianBlur, medianBlur, circle, LINE_AA, COLOR_GRAY2BGR
+from cv2 import cvtColor, convertScaleAbs, GaussianBlur, blur, circle, LINE_AA, COLOR_GRAY2BGR
 from math import sqrt
 from os.path import join
 import numpy as np
@@ -31,7 +31,7 @@ def round_blur(img, bboxes):
                (255, 255, 255), -1, LINE_AA)
 
     mask_img = GaussianBlur(mask, (21, 21), 11)
-    img_all_blurred = medianBlur(img, 99)
+    img_all_blurred = blur(img, (20, 20))
     return alphaBlend(img, img_all_blurred, mask_img)
 
 
@@ -40,7 +40,7 @@ def square_blur(img, bboxes):
         return img
 
     for bb in bboxes:
-        img[int(bb[1]):int(bb[3]), int(bb[0]):int(bb[2])] = medianBlur(
-            img[int(bb[1]):int(bb[3]), int(bb[0]):int(bb[2])], 99)
+        img[int(bb[1]):int(bb[3]), int(bb[0]):int(bb[2])] = blur(
+            img[int(bb[1]):int(bb[3]), int(bb[0]):int(bb[2])], (20, 20))
 
     return img
