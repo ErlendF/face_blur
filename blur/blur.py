@@ -1,12 +1,11 @@
-from cv2 import cvtColor, convertScaleAbs, GaussianBlur, blur, circle, LINE_AA, COLOR_GRAY2BGR
+from cv2 import blur, circle
 from math import sqrt
 from os.path import join
 import numpy as np
 
 
-def alphaBlend(img1, img2, mask):   # source: https://stackoverflow.com/a/48274875
-    """ alphaBlend img1 and img 2 (of CV_8UC3) with mask (CV_8UC1 or CV_8UC3)
-    """
+# Originally based on: https://stackoverflow.com/a/48274875
+def alphaBlend(img1, img2, mask):
     alpha = mask/255.0
     return img1*(1-alpha) + img2*alpha
 
@@ -23,8 +22,7 @@ def round_blur(img, bboxes):
 
         circle_center = (int((bb[0] + bb[2]) // 2), int((bb[1] + bb[3]) // 2))
         circle_radius = int(sqrt(w * w + h * h) // 2)
-        circle(mask, circle_center, circle_radius,
-               (255, 255, 255), -1, LINE_AA)
+        circle(mask, circle_center, circle_radius, (255, 255, 255), -1)
 
     mask_img = blur(mask, (21, 21))
     img_all_blurred = blur(img, (21, 21))
