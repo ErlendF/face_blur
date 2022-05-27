@@ -7,12 +7,8 @@ import numpy as np
 def alphaBlend(img1, img2, mask):   # source: https://stackoverflow.com/a/48274875
     """ alphaBlend img1 and img 2 (of CV_8UC3) with mask (CV_8UC1 or CV_8UC3)
     """
-    if mask.ndim == 3 and mask.shape[-1] == 3:
-        alpha = mask/255.0
-    else:
-        alpha = cvtColor(mask, COLOR_GRAY2BGR)/255.0
-    blended = convertScaleAbs(img1*(1-alpha) + img2*alpha)
-    return blended
+    alpha = mask/255.0
+    return img1*(1-alpha) + img2*alpha
 
 
 def round_blur(img, bboxes):
@@ -30,8 +26,8 @@ def round_blur(img, bboxes):
         circle(mask, circle_center, circle_radius,
                (255, 255, 255), -1, LINE_AA)
 
-    mask_img = GaussianBlur(mask, (21, 21), 11)
-    img_all_blurred = blur(img, (20, 20))
+    mask_img = blur(mask, (21, 21))
+    img_all_blurred = blur(img, (21, 21))
     return alphaBlend(img, img_all_blurred, mask_img)
 
 

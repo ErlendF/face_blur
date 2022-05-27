@@ -2,7 +2,6 @@ import numpy as np
 from scipy.spatial.distance import cosine
 from scipy.optimize import linear_sum_assignment
 
-# Bboxes from arcface: [x1, y1, x2, y2, certainty]
 dist_threshold = 1.0
 feat_weight = 1.0
 bbox_weight = 0.001
