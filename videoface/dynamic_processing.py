@@ -7,7 +7,7 @@ from .next_list import NextList
 from .deep_face import deep_face_process
 
 
-def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6, processing_func=deep_face_process, shot_transitions=None):
+def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6, processing_func=deep_face_process, shot_transitions=None, frames=None):
     # Initially setting the search interval to the middle of the min and max
     interval = (min_interval + max_interval)//2
     process_consequtively = 0
@@ -62,7 +62,7 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
             continue
 
         # Processing the queued images
-        frames = processing_func(imgs, img_nrs)
+        frames = processing_func(imgs, img_nrs, frames)
         for k, v in frames.items():
             # Storing the processed information for future use
             frames_by_nr[k] = v

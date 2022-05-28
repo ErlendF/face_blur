@@ -2,13 +2,17 @@ from face_recognition import batch_face_locations, face_encodings
 from .file import read_frame
 
 
-def dlib_process(img_names, img_nrs):
+def dlib_process(img_names, img_nrs, frames=None):
     if len(img_names) == 0:
         return {}
 
     imgs = []
-    for filename in img_names:
-        imgs.append(read_frame(filename))
+    if frames is None:
+        for filename in img_names:
+            imgs.append(read_frame(filename))
+    else:
+        for nr in img_nrs:
+            imgs.append(frames[nr])
 
     locs = batch_face_locations(
         imgs, number_of_times_to_upsample=0, batch_size=len(imgs))

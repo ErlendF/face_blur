@@ -9,11 +9,15 @@ from .next_list import NextList
 model = TransNetV2()
 
 
-def get_shot_transitions(img_dir, file_ext="png", shot_transition_threshold=0.5):
+def get_shot_transitions(img_dir, file_ext="png", shot_transition_threshold=0.5, frames=None):
     st = NextList()
     st_frames = []
-    for filepath in sorted(glob(join(img_dir, "*" + file_ext))):
-        st_frames.append(resize(imread(filepath), dsize=(48, 27)))
+    if frames is None:
+        for filepath in sorted(glob(join(img_dir, "*" + file_ext))):
+            st_frames.append(resize(imread(filepath), dsize=(48, 27)))
+    else:
+        for i in range(len(frames)):
+            st_frames.append(resize(frames[i], dsize=(48, 27)))
 
     if len(st_frames) == 0:
         return None

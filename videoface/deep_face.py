@@ -89,7 +89,7 @@ def preprocess_faces(img, target_size=(224, 224), grayscale=False, enforce_detec
     return pixels, regions
 
 
-def deep_face_process(img_names, img_nrs):
+def deep_face_process(img_names, img_nrs, frames=None):
     if len(img_names) == 0:
         return {}
 
@@ -98,7 +98,11 @@ def deep_face_process(img_names, img_nrs):
     pixels_len = {}
 
     for img_name, img_nr in zip(img_names, img_nrs):
-        img = read_frame(img_name)
+        if frames is None:
+            img = read_frame(img_name)
+        else:
+            img = frames[img_nrs]
+
         pixels, regions = preprocess_faces(
             img,
             detector_backend=detector_backend,

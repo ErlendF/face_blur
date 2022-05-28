@@ -14,7 +14,7 @@ def read_frame(filename):
     return imread(filename)
 
 
-def write_faces(finished_seqs, img_dir, out_dir, blur_function=round_blur):
+def write_faces(finished_seqs, img_dir, out_dir, blur_function=round_blur, frames=None):
     faces_by_nr = {}
     for seq in finished_seqs:
         for face in seq:
@@ -26,7 +26,11 @@ def write_faces(finished_seqs, img_dir, out_dir, blur_function=round_blur):
     for frame_nr, bboxes in faces_by_nr.items():
         file_name = "img" + str(frame_nr+1).rjust(7, '0') + ".png"
         out = join(out_dir, file_name)
-        img = blur_function(imread(join(img_dir, file_name)), bboxes)
+        if frames is None:
+            img = imread(join(img_dir, file_name))
+        else:
+            img = frames[frame_nr]
+        img = blur_function(img, bboxes)
         imwrite(out, img)
 
 
