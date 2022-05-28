@@ -101,7 +101,7 @@ def deep_face_process(img_names, img_nrs, frames=None):
         if frames is None:
             img = read_frame(img_name)
         else:
-            img = frames[img_nrs]
+            img = frames[img_nr]
 
         pixels, regions = preprocess_faces(
             img,
