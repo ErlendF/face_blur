@@ -1,4 +1,4 @@
-from cv2 import blur, circle
+from cv2 import blur, circle, mean
 from math import sqrt
 from os.path import join
 import numpy as np
@@ -39,10 +39,10 @@ def square_blur(img, bboxes):
 
     return img
 
-# Based on: https://pyimagesearch.com/2020/04/06/blur-and-anonymize-faces-with-opencv-and-python/
+# Originally based on: https://pyimagesearch.com/2020/04/06/blur-and-anonymize-faces-with-opencv-and-python/
 
 
-def pixelated_blur(img, bboxes, regions=5):
+def pixelated_blur(img, bboxes, regions=3):
     if bboxes is None:
         return img
 
@@ -56,13 +56,11 @@ def pixelated_blur(img, bboxes, regions=5):
         ySteps = np.linspace(bb[1], bb[3], regions + 1, dtype="int")
         for i in range(1, len(ySteps)):
             for j in range(1, len(xSteps)):
-                # compute the starting and ending (x, y)-coordinates
-                # for the current block
                 startX = xSteps[j - 1]
                 startY = ySteps[i - 1]
                 endX = xSteps[j]
                 endY = ySteps[i]
-                img[startY:endY, startX:endX] = blur(
-                    img[startY:endY, startX:endX], (21, 21))
+                img[startY:endY, startX:endX] = mean(
+                    img[startY:endY, startX:endX])[:3]
 
     return img
