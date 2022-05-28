@@ -1,3 +1,6 @@
 .vscode
 variables.py
 __pycache__
+.terraform*
+*.tfvars
+tfplan

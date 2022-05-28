@@ -35,3 +35,8 @@ variable "ecr_name" {
   default = "test_sagemaker_models"
   description = "Name of the ECR repository"
 }
+
+variable "bucket_name" {
+  type = string
+  description = "Name of the S3 bucket"
+}

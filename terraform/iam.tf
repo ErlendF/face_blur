@@ -99,3 +99,14 @@ data "aws_iam_policy_document" "notebook-ecr" {
     ]
   }
 }
+
+# This is intended for development purposes.
+# Permissions should be restricted to the minimum possible in a production environment
+resource "aws_iam_role_policy_attachment" "sagemaker_full_access" {
+  role       = aws_iam_role.notebook.id
+  policy_arn = data.aws_iam_policy.sagemaker_full_access.arn
+}
+
+data "aws_iam_policy" "sagemaker_full_access" {
+  arn = "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
+}
