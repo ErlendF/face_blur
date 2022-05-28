@@ -34,7 +34,7 @@ def write_faces(finished_seqs, img_dir, out_dir, blur_function=round_blur, frame
         imwrite(out, img)
 
 
-def display_bboxes(finished_seqs, img_dir, out_dir, color=(0, 0, 255)):
+def display_bboxes(finished_seqs, img_dir, out_dir, color=(0, 0, 255), frames=None):
     faces_by_nr = {}
     for seq in finished_seqs:
         for face in seq:
@@ -46,7 +46,10 @@ def display_bboxes(finished_seqs, img_dir, out_dir, color=(0, 0, 255)):
     for frame_nr, bboxes in faces_by_nr.items():
         file_name = "img" + str(frame_nr+1).rjust(7, '0') + ".png"
         out = join(out_dir, file_name)
-        img = imread(join(img_dir, file_name))
+        if frames is None:
+            img = imread(join(img_dir, file_name))
+        else:
+            img = frames[frame_nr]
         for bbox in bboxes:
             rectangle(img, (int(bbox[0]), int(bbox[1])),
                       (int(bbox[2]), int(bbox[3])), color, 2)
@@ -61,3 +64,10 @@ def copy_remaining_files(in_dir, out_dir):
 
         if not exists(out_file_path):
             copyfile(filepath, out_file_path)
+
+
+def read_all_frames(img_dir, file_ext="png"):
+    frames = []
+    for filepath in sorted(glob(join(img_dir, "*.png"))):
+        frames.append(imread(filepath))
+    return frames
