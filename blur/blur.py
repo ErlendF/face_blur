@@ -27,7 +27,7 @@ def round_blur(img, bboxes):
         circle_radius = int(sqrt(w * w + h * h) // 2)
         circle(mask, circle_center, circle_radius, (255, 255, 255), -1)
 
-    widest = (widest // 2)+1
+    widest = int((widest // 2)+1)
 
     mask_img = blur(mask, (21, 21))
     img_all_blurred = blur(img, (widest, widest))
