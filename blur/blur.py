@@ -16,21 +16,21 @@ def round_blur(img, bboxes):
 
     mask = np.zeros(img.shape, dtype='uint8')
 
-    widest = 0
+    blur_width = 0
     for bb in bboxes:
         h = abs(bb[1] - bb[3])
         w = abs(bb[0] - bb[2])
-        if w > widest:
-            widest = w
+        if w > blur_width:
+            blur_width = w
 
         circle_center = (int((bb[0] + bb[2]) // 2), int((bb[1] + bb[3]) // 2))
         circle_radius = int(sqrt(w * w + h * h) // 2)
         circle(mask, circle_center, circle_radius, (255, 255, 255), -1)
 
-    widest = int((widest // 2)+1)
+    blur_width = int((blur_width // 3)+1)
 
     mask_img = blur(mask, (21, 21))
-    img_all_blurred = blur(img, (widest, widest))
+    img_all_blurred = blur(img, (blur_width, blur_width))
     return alphaBlend(img, img_all_blurred, mask_img)
 
 
@@ -39,8 +39,9 @@ def square_blur(img, bboxes):
         return img
 
     for bb in bboxes:
+        blur_width = int(abs(bb[1] - bb[3])//3)+1
         img[int(bb[1]):int(bb[3]), int(bb[0]):int(bb[2])] = blur(
-            img[int(bb[1]):int(bb[3]), int(bb[0]):int(bb[2])], (20, 20))
+            img[int(bb[1]):int(bb[3]), int(bb[0]):int(bb[2])], (blur_width, blur_width))
 
     return img
 
