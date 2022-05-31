@@ -40,6 +40,7 @@ RUN apt-get update && \
     zip \
     && apt-get clean && rm -rf /tmp/* /var/tmp/*
 
+# ! Please note conda terms and conditions for commercial use: https://www.anaconda.com/blog/anaconda-commercial-edition-faq
 RUN wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
     && mkdir /root/.conda \
     && bash Miniconda3-latest-Linux-x86_64.sh -b \
