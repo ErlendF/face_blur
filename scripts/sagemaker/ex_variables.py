@@ -10,6 +10,7 @@ data_output_local = "/opt/ml/processing/output/"
 instance_count = 1
 instance_type = "ml.t3.large"
 volume_size_in_gb = 20
+job_prefix = ""
 tags = [
     {
         "Key": "User",

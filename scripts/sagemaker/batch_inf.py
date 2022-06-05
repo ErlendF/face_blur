@@ -6,20 +6,33 @@ from datetime import datetime
 # Storing more sensitive variables in separate file to avoid commiting them
 import variables
 
+repository_name = "test_sagemaker_models"
+region = "eu-north-1"
+tags = [
+    {
+        "Key": "User",
+        "Value": "Erlend"
+    },
+    {
+        "Key": "Team",
+        "Value": "Platform"
+    }
+]
+
 now = datetime.now().strftime("%Y%m%d%H%M%S")
 
 # This really shouldn't be necessary, but it is
 os.environ["AWS_PROFILE"] = variables.aws_account
-os.environ["AWS_DEFAULT_REGION"] = variables.region
+os.environ["AWS_DEFAULT_REGION"] = region
 
 
 session = boto3.Session(profile_name=variables.aws_account)
-smc = boto3.client("sagemaker", region_name=variables.region)
-ecrc = boto3.client("ecr", region_name=variables.region)
+smc = boto3.client("sagemaker", region_name=region)
+ecrc = boto3.client("ecr", region_name=region)
 
 # Cleaning up untagged images
 img_resp = ecrc.list_images(
-    repositoryName=variables.repository_name,
+    repositoryName=repository_name,
     filter={
         "tagStatus": "UNTAGGED"
     }
@@ -28,7 +41,7 @@ img_resp = ecrc.list_images(
 if len(img_resp["imageIds"]) != 0:
     print("Cleaning up {} untagged images".format(len(img_resp["imageIds"])))
     img_del_resp = ecrc.batch_delete_image(
-        repositoryName=variables.repository_name,
+        repositoryName=repository_name,
         imageIds=img_resp["imageIds"]
     )
     if img_del_resp["ResponseMetadata"]["HTTPStatusCode"] != 200:
@@ -53,14 +66,14 @@ new_model_resp = smc.create_model(
         # "ModelDataUrl": variables.model_s3_uri
     },
     ExecutionRoleArn=variables.smRoleArn,
-    Tags=variables.tags
+    Tags=tags
 )
 if new_model_resp["ResponseMetadata"]["HTTPStatusCode"] != 200:
     print("Could not make model: {}".format(new_model_resp))
     sys.exit(1)
 
 # Making batch transform job
-transform_job_name = "test-transform-" + now
+transform_job_name = variables.job_prefix + "test-transform-" + now
 print("Making batch transformjob {}".format(transform_job_name))
 
 tf_resp = smc.create_transform_job(
@@ -87,7 +100,7 @@ tf_resp = smc.create_transform_job(
         "InstanceType": variables.instance_type,
         "InstanceCount": variables.instance_count
     },
-    Tags=variables.tags
+    Tags=tags
 )
 if tf_resp["ResponseMetadata"]["HTTPStatusCode"] != 200:
     print("Could not make batch transform job: {}".format(tf_resp))

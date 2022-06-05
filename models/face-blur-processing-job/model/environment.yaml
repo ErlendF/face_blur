@@ -29,7 +29,7 @@ dependencies:
     - shapely
     - dlib
     - face_recognition   # requires: https://gist.github.com/ageitgey/629d75c1baac34dfa5ca2a1928a7aeaf
-    - git+https://github.com/ErlendF/face_blur.git@1e43ba17cc1aa6e6e7e847408c586ae2b416b922
+    - git+https://github.com/ErlendF/face_blur.git@53cf76c84468b32dc970c1d7d675718ddb6a46ec
     
     # Installing TransNetV2:
     # 1. Activate this conda environment

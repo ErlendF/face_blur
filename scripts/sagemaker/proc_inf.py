@@ -34,35 +34,8 @@ if len(img_resp["imageIds"]) != 0:
     if img_del_resp["ResponseMetadata"]["HTTPStatusCode"] != 200:
         print("Could not clean up untagged images: {}".format(img_del_resp))
 
-# # Deleting existing models
-# models_resp = smc.list_models()
-# for model in models_resp["Models"]:
-#     print("Removing model {}".format(model["ModelName"]))
-#     del_resp = smc.delete_model(ModelName=model["ModelName"])
-#     if del_resp["ResponseMetadata"]["HTTPStatusCode"] != 200:
-#         print("Could not delete model {}".format(model["ModelName"]))
-
-# # Making new model
-# model_name = "model-" + now
-# print("Making new model {}".format(model_name))
-
-# new_model_resp = smc.create_model(
-#     ModelName=model_name,
-#     PrimaryContainer={
-#         "Image": variables.imageURI,
-#         # "ModelDataUrl": variables.model_s3_uri
-#     },
-#     ExecutionRoleArn=variables.smRoleArn,
-#     Tags=variables.tags
-# )
-# if new_model_resp["ResponseMetadata"]["HTTPStatusCode"] != 200:
-#     print("Could not make model: {}".format(new_model_resp))
-#     sys.exit(1)
-
-# print(f"new model resp: {new_model_resp}")
-
 # Making batch transform job
-processing_job_name = "test-processing-" + now
+processing_job_name = variables.job_prefix + "test-processing-" + now
 print("Making processing job {}".format(processing_job_name))
 
 proc_resp = smc.create_processing_job(
