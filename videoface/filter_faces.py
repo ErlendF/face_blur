@@ -6,7 +6,7 @@ from scipy.spatial.distance import cosine
 from .deep_face import deep_face_process
 
 # Preprocess known face to use in "filter_known_faces"
-# The processed known faces are compared to the faces in the video, and should therfore use the same processing function as when parsing the video
+# The processed known faces are compared to the faces in the video, and should therefore use the same processing function as when parsing the video
 
 
 def init_known_faces(known_people_img_dir, processing_func=deep_face_process):

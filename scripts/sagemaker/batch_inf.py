@@ -3,7 +3,7 @@ import os
 import sys
 from datetime import datetime
 
-# Storing more sensitive variables in separate file to avoid commiting them
+# Storing more sensitive variables in separate file to avoid committing them
 import variables
 
 repository_name = "test_sagemaker_models"

@@ -64,7 +64,7 @@ def compare_faces(f1, f2):
 
 def compare(prev_faces, new_faces):
     if len(prev_faces[1]) != len(new_faces[1]) and new_faces[0] != prev_faces[0] + 1:
-        return [], False   # There is a difference in the number of faces, and the frames are not adjacent. Shoud get more info
+        return [], False   # There is a difference in the number of faces, and the frames are not adjacent. Should get more info
 
     identified = map_faces(prev_faces[1], new_faces[1])
     mapped = True
