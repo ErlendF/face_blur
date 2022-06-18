@@ -5,7 +5,7 @@ def avg_smoothing(seqs, smoothing_width=9):
     df = smoothing_width//2
 
     for i in range(len(seqs)):
-        # Getting a copy of the sequence only containig bounding boxes to make it a numpy array
+        # Getting a copy of the sequence only containing bounding boxes to make it a numpy array
         seq_copy = np.array([s["bbox"].copy() for s in seqs[i]])
 
         # Smoothing each point of the bounding box individually

@@ -4,8 +4,9 @@ from glob import glob
 from os import environ
 from sys import exit
 
-# Storing more sensitive variables in separate file to avoid commiting them
+# Storing more sensitive variables in separate file to avoid committing them
 import variables
+
 
 def upload_folder_by_shot(dir, dest):
     environ["AWS_PROFILE"] = variables.aws_account
@@ -23,11 +24,8 @@ def upload_folder_by_shot(dir, dest):
             current += 1
 
         filename = filepath.removeprefix(dir).removeprefix("/")
-        resp = s3_client.upload_file(filepath, dest + "/" + current + "/" + filename)
+        resp = s3_client.upload_file(
+            filepath, dest + "/" + current + "/" + filename)
         if resp["ResponseMetadata"]["HTTPStatusCode"] != 200:
-                print("Could not upload file to s3: {}".format(resp))
-                exit(1)
-
-
-
-
+            print("Could not upload file to s3: {}".format(resp))
+            exit(1)

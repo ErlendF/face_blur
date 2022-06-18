@@ -7,10 +7,10 @@ from .next_list import NextList
 from .deep_face import deep_face_process
 
 
-def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_treshold=6, processing_func=deep_face_process, shot_transitions=None, frames=None):
+def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_threshold=6, processing_func=deep_face_process, shot_transitions=None, frames=None):
     # Initially setting the search interval to the middle of the min and max
     interval = (min_interval + max_interval)//2
-    process_consequtively = 0
+    process_consecutively = 0
 
     current = 0  # The frame currently being processed
     prev = -1   # The previous frame that was processed
@@ -93,7 +93,7 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
             # If the two frames are adjacent, there is no more exploration to do even if they don't match
             if not matched and current != prev+1:
                 # Queueing all frames between the non-matched frames
-                # TODO: more finegrained exploration?
+                # TODO: more fine grained exploration?
                 for frame_nr in range(prev+1, current):
                     imgs.append(get_file_name(frame_nr, img_dir))
                     img_nrs.append(frame_nr)
@@ -101,16 +101,16 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
                 current = prev+1    # Setting back the current
                 # Reducing the interval
                 interval = max(int(interval*0.7), min_interval)
-                process_consequtively = 0
+                process_consecutively = 0
                 break
             else:
                 if current != prev+1:
-                    # If enough frames have been successfully processed consequtively, increasing the interval
-                    if process_consequtively >= proc_count_treshold:
+                    # If enough frames have been successfully processed consecutively, increasing the interval
+                    if process_consecutively >= proc_count_threshold:
                         interval = min(int(interval*1.3), max_interval)
-                        process_consequtively = 0
+                        process_consecutively = 0
                     else:
-                        process_consequtively += 1
+                        process_consecutively += 1
 
                 # Storing the matching and updating completed
                 matchings[(prev, current)] = matches
