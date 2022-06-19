@@ -57,17 +57,64 @@ def display_bboxes(finished_seqs, img_dir, out_dir, color=(0, 0, 255), frames=No
         imwrite(out, img)
 
 
-def copy_remaining_files(in_dir, out_dir):
-    for filepath in sorted(glob(join(in_dir, "*.png"))):
-        filename = filepath.removeprefix(in_dir).removeprefix("/")
-        out_file_path = join(out_dir, filename)
+def copy_remaining_files(img_dir, out_dir, file_ext="png", frames=None, frames_by_nr=None, first_frame=None, last_frame=None):
+    if first_frame is None:
+        first_frame = 0
 
-        if not exists(out_file_path):
-            copyfile(filepath, out_file_path)
+    if last_frame is None:
+        # Finding the last frame
+        last_frame = sorted(glob(join(img_dir, "*." + file_ext)))[-1]
+        # +1 for / and . in filename, -1 to make the frame numbers 0-indexed
+
+        last_frame = int(
+            last_frame[len(img_dir)+1+len("img"):len(last_frame)-(len(file_ext)+1)]) - 1
+
+    if frames is not None:
+        if frames_by_nr is not None:
+            for img_nr in range(first_frame, last_frame+1):
+                if img_nr not in frames_by_nr:
+                    out_file_path = join(out_dir, get_file_name(
+                        img_nr, img_dir).removeprefix(img_dir).removeprefix("/"))
+                    imwrite(out_file_path, frames[img_nr])
+        else:
+            for img_nr in range(first_frame, last_frame+1):
+                filepath = get_file_name(img_nr, img_dir)
+                out_file_path = join(
+                    out_dir, filepath.removeprefix(img_dir).removeprefix("/"))
+                if not exists(out_file_path):
+                    imwrite(out_file_path, frames[img_nr])
+    else:
+        if frames_by_nr is not None:
+            for img_nr in range(first_frame, last_frame+1):
+                if img_nr not in frames_by_nr:
+                    filepath = get_file_name(img_nr, img_dir)
+                    out_file_path = join(
+                        out_dir, filepath.removeprefix(img_dir).removeprefix("/"))
+                    copyfile(filepath, out_file_path)
+        else:
+            for img_nr in range(first_frame, last_frame+1):
+                filepath = get_file_name(img_nr, img_dir)
+                out_file_path = join(
+                    out_dir, filepath.removeprefix(img_dir).removeprefix("/"))
+
+                if not exists(out_file_path):
+                    copyfile(filepath, out_file_path)
 
 
-def read_all_frames(img_dir, file_ext="png"):
-    frames = []
-    for filepath in sorted(glob(join(img_dir, "*.png"))):
-        frames.append(imread(filepath))
+def read_all_frames(img_dir, file_ext="png", first_frame=None, last_frame=None):
+    frames = {}
+
+    if first_frame is None:
+        first_frame = 0
+
+    if last_frame is None:
+        # Finding the last frame
+        last_frame = sorted(glob(join(img_dir, "*." + file_ext)))[-1]
+        # +1 for / and . in filename, -1 to make the frame numbers 0-indexed
+
+        last_frame = int(
+            last_frame[len(img_dir)+1+len("img"):len(last_frame)-(len(file_ext)+1)]) - 1
+
+    for img_nr in range(first_frame, last_frame+1):
+        frames[img_nr] = imread(get_file_name(img_nr, img_dir))
     return frames

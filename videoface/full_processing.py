@@ -7,7 +7,7 @@ from .deep_face import deep_face_process
 from .file import get_file_name
 
 
-def full_process(img_dir, file_ext="png", processing_func=deep_face_process, batch_size=32, first_frame=None, last_frame=None):
+def full_process(img_dir, file_ext="png", processing_func=deep_face_process, batch_size=32, frames=None, first_frame=None, last_frame=None):
     imgs = []
     img_nrs = []
     frames_by_nr = NextList()
@@ -30,8 +30,8 @@ def full_process(img_dir, file_ext="png", processing_func=deep_face_process, bat
         img_nrs.append(img_nr)
 
         if len(imgs) >= batch_size:  # Batch size reached, processing
-            frames = processing_func(imgs, img_nrs)
-            for k, v in frames.items():
+            proc_frames = processing_func(imgs, img_nrs, frames)
+            for k, v in proc_frames.items():
                 frames_by_nr[k] = v
 
             imgs = []
@@ -39,8 +39,8 @@ def full_process(img_dir, file_ext="png", processing_func=deep_face_process, bat
 
     # Processing unhandled images
     if len(imgs) != 0:
-        frames = processing_func(imgs, img_nrs)
-        for k, v in frames.items():
+        proc_frames = processing_func(imgs, img_nrs, frames)
+        for k, v in proc_frames.items():
             frames_by_nr[k] = v
 
         imgs = []

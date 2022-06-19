@@ -66,8 +66,8 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
             continue
 
         # Processing the queued images
-        proc_frame = processing_func(imgs, img_nrs, frames)
-        for k, v in proc_frame.items():
+        proc_frames = processing_func(imgs, img_nrs, frames)
+        for k, v in proc_frames.items():
             # Storing the processed information for future use
             frames_by_nr[k] = v
 
