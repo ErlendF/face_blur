@@ -6,15 +6,15 @@ from shutil import copyfile
 from blur import round_blur
 
 
-def get_file_name(nr, dir):
-    return join(dir, "img" + str(nr+1).rjust(7, '0') + ".png")
+def get_file_name(nr, dir, file_ext="png"):
+    return join(dir, "img" + str(nr+1).rjust(7, '0') + "." + file_ext)
 
 
 def read_frame(filename):
     return imread(filename)
 
 
-def write_faces(finished_seqs, img_dir, out_dir, blur_function=round_blur, frames=None):
+def write_faces(finished_seqs, img_dir, out_dir, file_ext="png", blur_function=round_blur, frames=None):
     faces_by_nr = {}
     for seq in finished_seqs:
         for face in seq:
@@ -24,7 +24,7 @@ def write_faces(finished_seqs, img_dir, out_dir, blur_function=round_blur, frame
                 faces_by_nr[face["bbox"][4]] = [face["bbox"]]
 
     for frame_nr, bboxes in faces_by_nr.items():
-        file_name = "img" + str(frame_nr+1).rjust(7, '0') + ".png"
+        file_name = "img" + str(frame_nr+1).rjust(7, '0') + "." + file_ext
         out = join(out_dir, file_name)
         if frames is None:
             img = imread(join(img_dir, file_name))
@@ -34,7 +34,7 @@ def write_faces(finished_seqs, img_dir, out_dir, blur_function=round_blur, frame
         imwrite(out, img)
 
 
-def display_bboxes(finished_seqs, img_dir, out_dir, color=(0, 0, 255), frames=None):
+def display_bboxes(finished_seqs, img_dir, out_dir, file_ext="png", color=(0, 0, 255), frames=None):
     faces_by_nr = {}
     for seq in finished_seqs:
         for face in seq:
@@ -44,7 +44,7 @@ def display_bboxes(finished_seqs, img_dir, out_dir, color=(0, 0, 255), frames=No
                 faces_by_nr[face["bbox"][4]] = [face["bbox"]]
 
     for frame_nr, bboxes in faces_by_nr.items():
-        file_name = "img" + str(frame_nr+1).rjust(7, '0') + ".png"
+        file_name = "img" + str(frame_nr+1).rjust(7, '0') + "." + file_ext
         out = join(out_dir, file_name)
         if frames is None:
             img = imread(join(img_dir, file_name))

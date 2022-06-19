@@ -26,7 +26,7 @@ def full_process(img_dir, file_ext="png", processing_func=deep_face_process, bat
 
     # Iterating through every image and processing them
     for img_nr in range(first_frame, last_frame+1):
-        imgs.append(get_file_name(img_nr, img_dir))
+        imgs.append(get_file_name(img_nr, img_dir, file_ext=file_ext))
         img_nrs.append(img_nr)
 
         if len(imgs) >= batch_size:  # Batch size reached, processing

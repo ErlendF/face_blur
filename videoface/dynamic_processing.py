@@ -44,20 +44,22 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
         if add_next >= last_frame:
             # Reached the last frame, setting add_next to -1 to mark it as done
             add_next = -1
-            imgs.append(get_file_name(last_frame, img_dir))
+            imgs.append(get_file_name(last_frame, img_dir, file_ext=file_ext))
             img_nrs.append(last_frame)
         elif add_next >= 0 and len(imgs) < batch_size:
             # Adding the next frame to the list
-            imgs.append(get_file_name(add_next, img_dir))
+            imgs.append(get_file_name(add_next, img_dir, file_ext=file_ext))
             img_nrs.append(add_next)
             if shot_transitions is not None:
                 next_sc = shot_transitions.next_key(add_next)
                 if next_sc is not None and add_next + interval >= next_sc:
-                    imgs.append(get_file_name(next_sc, img_dir))
+                    imgs.append(get_file_name(
+                        next_sc, img_dir, file_ext=file_ext))
                     img_nrs.append(next_sc)
 
                     if next_sc+1 <= last_frame:
-                        imgs.append(get_file_name(next_sc+1, img_dir))
+                        imgs.append(get_file_name(
+                            next_sc+1, img_dir, file_ext=file_ext))
                         img_nrs.append(next_sc+1)
 
             add_next += interval
@@ -97,9 +99,9 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
             # If the two frames are adjacent, there is no more exploration to do even if they don't match
             if not matched and current != prev+1:
                 # Queueing all frames between the non-matched frames
-                # TODO: more fine grained exploration?
                 for frame_nr in range(prev+1, current):
-                    imgs.append(get_file_name(frame_nr, img_dir))
+                    imgs.append(get_file_name(
+                        frame_nr, img_dir, file_ext=file_ext))
                     img_nrs.append(frame_nr)
 
                 current = prev+1    # Setting back the current
