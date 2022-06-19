@@ -7,7 +7,7 @@ from .next_list import NextList
 from .deep_face import deep_face_process
 
 
-def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_threshold=6, processing_func=deep_face_process, shot_transitions=None, frames=None):
+def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, max_interval=25, proc_count_threshold=6, processing_func=deep_face_process, shot_transitions=None, frames=None, first_frame=None, last_frame=None):
     # Initially setting the search interval to the middle of the min and max
     interval = (min_interval + max_interval)//2
     process_consecutively = 0
@@ -16,6 +16,8 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
     prev = -1   # The previous frame that was processed
     complete = -1  # The last completely processed frame
     add_next = 0    # The next frame to add to the list of frames to be processed
+    if first_frame is not None:
+        add_next = first_frame
 
     imgs = []   # Images that should be processed
     img_nrs = []  # The corresponding frame numbers
@@ -24,13 +26,15 @@ def dynamically_process(img_dir, file_ext="png", batch_size=32, min_interval=6, 
     # A map substitute storing the identified bounding boxes and features for each frame
     frames_by_nr = NextList()
 
-    # Finding the last frame
     img_dir = img_dir.removesuffix("/")
-    last_frame = sorted(glob(join(img_dir, "*." + file_ext)))[-1]
 
-    # +1 for / and . in filename, -1 to make the frame numbers 0-indexed
-    last_frame = int(
-        last_frame[len(img_dir)+1+len("img"):len(last_frame)-(len(file_ext)+1)]) - 1
+    if last_frame is None:
+        # Finding the last frame
+        last_frame = sorted(glob(join(img_dir, "*." + file_ext)))[-1]
+
+        # +1 for / and . in filename, -1 to make the frame numbers 0-indexed
+        last_frame = int(
+            last_frame[len(img_dir)+1+len("img"):len(last_frame)-(len(file_ext)+1)]) - 1
 
     # Looping until the entire video is processed
     while True:
