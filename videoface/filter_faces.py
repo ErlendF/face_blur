@@ -2,6 +2,7 @@ from glob import glob
 from os.path import join
 from sys import float_info
 from scipy.spatial.distance import cosine
+import numpy as np
 
 from .deep_face import deep_face_process
 
@@ -9,21 +10,26 @@ from .deep_face import deep_face_process
 # The processed known faces are compared to the faces in the video, and should therefore use the same processing function as when parsing the video
 
 
-def init_known_faces(known_people_img_dir, processing_func=deep_face_process):
-    processed_faces = []
+def init_known_faces(known_people_img_dir, processing_func=deep_face_process, frames=None):
+    processed_faces = {}
 
-    for filepath in sorted(glob(join(known_people_img_dir, "*"))):
-        processed_faces.append(processing_func([filepath], [0]))
+    if frames is None:
+        img_names = sorted(glob(join(known_people_img_dir, "*")))
+        img_nrs = np.arange(0, len(img_names))
+        processed_faces = processing_func(img_names, img_nrs)
+    else:
+        img_names = np.arange(0, len(frames))
+        img_nrs = np.arange(0, len(frames))
+        processed_faces = processing_func(img_names, img_nrs, frames=frames)
 
     if len(processed_faces) == 0:
         return None
 
     known_faces = []
-    for m in processed_faces:
-        for img_f in m.values():
-            for f in img_f:
-                # The positions of the known people from the reference photos is of no importance, removing it
-                known_faces.append(f["feat"])
+    for img in processed_faces.values():
+        for f in img:
+            # The positions of the known people from the reference photos is of no importance, removing it
+            known_faces.append(f["feat"])
 
     return known_faces
 
